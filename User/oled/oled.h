@@ -18,6 +18,8 @@
 void OLED_Initialize(void);
 void OLED_DrawPic(uint8_t* pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8_t height);
 void OLED_DrawGuiBorder(void);
+void OLED_UpdateScreen(void);
+void OLED_ForceUpdateScreen(void);
 
 #if _TEST_GUI_AVAILABLE
 void OLED_DrawTestGui(void);

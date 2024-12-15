@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"bsp_iic_debug.h": "c",
+			"bsp_oled_debug.h": "c",
+			"bsp_led.h": "c",
+			"stm32f10x.h": "c",
+			"bsp_gpio_led.h": "c",
+			"iic_extension.h": "c",
+			"main.h": "c",
+			"tetris.h": "c"
+		}
+	}
+}
