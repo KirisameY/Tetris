@@ -32,3 +32,4 @@
 .\objects\main.o: ..\User\iic/bsp_iic_debug.h
 .\objects\main.o: ..\User\oled/oled.h
 .\objects\main.o: ..\User\tetris.h
+.\objects\main.o: ..\User\main.h

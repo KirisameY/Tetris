@@ -5,6 +5,7 @@
 #include "oled/oled.h"
 
 #include "tetris.h"
+#include "main.h"
 
 int main(void)
 {
@@ -20,8 +21,20 @@ int main(void)
         int i = 0;
         while (i < 0x888888) i++;
         RGB_ALL_OFF
+        
+    #if _TEST_GUI_AVAILABLE
         OLED_DrawTestGui();
+    #endif
 
         Tetris_MainGameLoop();
     }
+}
+
+/// @brief 锁死程序并打出异常
+/// @param msg 异常信息(未实装)
+void exception(char* msg)
+{
+    // 回头有必要的话整个串口打印异常信息，没必要就算了
+    R_LED_ON_ONLY
+    for(;;); //锁死程序
 }

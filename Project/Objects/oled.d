@@ -1,10 +1,10 @@
 .\objects\oled.o: ..\User\oled\oled.c
 .\objects\oled.o: ..\User\oled\oled.h
+.\objects\oled.o: D:\Arm\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\oled.o: ..\User\oled\bitmaps.h
 .\objects\oled.o: ..\User\oled\../iic/bsp_iic_debug.h
 .\objects\oled.o: ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h
 .\objects\oled.o: ..\Libraries\CMSIS\CM3\CoreSupport\core_cm3.h
-.\objects\oled.o: D:\Arm\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\oled.o: ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h
 .\objects\oled.o: ..\User\stm32f10x_conf.h
 .\objects\oled.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h
@@ -32,3 +32,4 @@
 .\objects\oled.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_wwdg.h
 .\objects\oled.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
 .\objects\oled.o: ..\User\oled\../iic/iic_extension.h
+.\objects\oled.o: ..\User\oled\../main.h

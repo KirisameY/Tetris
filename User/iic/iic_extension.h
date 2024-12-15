@@ -1,5 +1,5 @@
-#ifndef _IIC_EXTENSION
-#define _IIC_EXTENSION
+#ifndef __IIC_EXTENSION_H
+#define __IIC_EXTENSION_H
 
 // 扩展定义
 

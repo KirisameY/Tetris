@@ -2,6 +2,9 @@
 #include "bitmaps.h"
 #include "../iic/bsp_iic_debug.h"
 #include "../iic/iic_extension.h"
+#include "../main.h"
+
+#include <stdint.h>
 
 /// @brief 初始化OLED
 /// @param 
@@ -66,21 +69,34 @@ void OLED_Initialize(void)
 }
 
 
-/// @brief 绘制测试用UI图像
-/// @param  
-void OLED_DrawTestGui(void)
+/// @brief 绘制图像
+/// @param pic 要绘制的图像序列
+/// @param xpos x起始坐标(按分页算，0-7)
+/// @param width 宽度(按分页算，1-8)
+/// @param ypos y起始坐标(0-127)
+/// @param height 高度(1-128)
+void OLED_DrawPic(uint8_t* pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8_t height)
 {
+    uint8_t xend = xpos + width - 1,
+            yend = ypos + height - 1;
+
+    //检查参数合法性
+    if (xend >= 8 || yend >= 128 || width < 1 || height < 1)
+    {
+        exception("OLED_DrawPic接收到非法参数!");
+    }
+
     IIC_Start();
     IIC_SEND_N_WAIT(OLED_CALL_WR)
     IIC_SEND_N_WAIT(OLED_WR_CMD_CO)
 
     IIC_SEND_N_WAIT(0x22)
-    IIC_SEND_N_WAIT(0x00)
-    IIC_SEND_N_WAIT(0x07) //重置页地址
+    IIC_SEND_N_WAIT(xpos)
+    IIC_SEND_N_WAIT(xend) //设置页地址
     
     IIC_SEND_N_WAIT(0x21)
-    IIC_SEND_N_WAIT(0x00)
-    IIC_SEND_N_WAIT(0x7f) //重置列地址
+    IIC_SEND_N_WAIT(ypos)
+    IIC_SEND_N_WAIT(yend) //设置列地址
 
     // IIC_Stop();
 
@@ -89,10 +105,27 @@ void OLED_DrawTestGui(void)
 
     IIC_SEND_N_WAIT(OLED_WR_DATA_CO)
 
-    for (uint16_t i = 0; i < 128*8; i++)
+    uint16_t bytes = width*height;
+    for (uint16_t i = 0; i < bytes; i++)
     {
-        IIC_SEND_N_WAIT(TestGui[i])
+        IIC_SEND_N_WAIT(pic[i])
     }
 
     IIC_Stop();
+}
+
+#if _TEST_GUI_AVAILABLE
+/// @brief 绘制测试用UI图像
+/// @param  
+void OLED_DrawTestGui(void)
+{
+    OLED_DrawPic(TestGui, 0, 8, 0, 128);
+}
+#endif
+
+/// @brief 绘制UI边框图像
+/// @param  
+void OLED_DrawGuiBorder(void)
+{
+    OLED_DrawPic(GuiBorder, 0, 8, 0, 128);
 }
