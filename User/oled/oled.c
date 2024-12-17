@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-uint8_t scr_cache[128][8]; // 图像缓存
+uint64_t scr_cache[128]; // 图像缓存
 uint8_t scr_dirty[16];     // 脏标记(每个位代表一个列)
 
 /// @brief 初始化OLED
@@ -134,8 +134,8 @@ void OLED_DrawGuiBorder(void)
 void OLED_UpdateScreen(void)
 {
     IIC_Start();
-    IIC_SEND_N_WAIT(OLED_WR_CMD_CO)
     IIC_SEND_N_WAIT(OLED_CALL_WR)
+    IIC_SEND_N_WAIT(OLED_WR_CMD_CO)
     IIC_SEND_N_WAIT(0x22)
     IIC_SEND_N_WAIT(0x00)
     IIC_SEND_N_WAIT(0x07) // 重置页地址
@@ -176,7 +176,7 @@ void OLED_UpdateScreen(void)
 
             for (uint8_t k = 0; k < 8; k++)
             {
-                IIC_SEND_N_WAIT(scr_cache[col][k])
+                IIC_SEND_N_WAIT(((uint8_t*)(void*)scr_cache)[col*8+k]);
             }
             con = 1;
         }
@@ -189,7 +189,7 @@ void OLED_UpdateScreen(void)
 
 void OLED_ForceUpdateScreen(void)
 {
-    OLED_DrawPic(scr_cache[0], 0, 8, 0, 128);
+    OLED_DrawPic((uint8_t*)(void*)scr_cache, 0, 8, 0, 128);
     // 重置图形脏标记:
     for (uint8_t i = 0; i < 16; i++)
     {

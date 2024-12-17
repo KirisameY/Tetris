@@ -87,13 +87,19 @@ Section Cross References
     main.o(i.main) refers to bsp_gpio_led.o(i.LED_ON) for LED_ON
     main.o(i.main) refers to bsp_gpio_led.o(i.LED_OFF) for LED_OFF
     main.o(i.main) refers to tetris.o(i.Tetris_MainGameLoop) for Tetris_MainGameLoop
+    tetris.o(i.Tetris_CalculateGridLine) refers to tetris.o(.constdata) for G_GridCells
+    tetris.o(i.Tetris_CalculateGridLine) refers to oled.o(.bss) for scr_dirty
+    tetris.o(i.Tetris_Draw) refers to tetris.o(i.Tetris_CalculateGridLine) for Tetris_CalculateGridLine
     tetris.o(i.Tetris_Draw) refers to oled.o(i.OLED_UpdateScreen) for OLED_UpdateScreen
+    tetris.o(i.Tetris_Draw) refers to tetris.o(.bss) for Tetris_GameGrid
+    tetris.o(i.Tetris_InitializeGameState) refers to llshl.o(.text) for __aeabi_llsl
     tetris.o(i.Tetris_InitializeGameState) refers to oled.o(i.OLED_ForceUpdateScreen) for OLED_ForceUpdateScreen
-    tetris.o(i.Tetris_InitializeGameState) refers to oled.o(.bss) for scr_dirty
+    tetris.o(i.Tetris_InitializeGameState) refers to oled.o(.bss) for scr_cache
     tetris.o(i.Tetris_InitializeGameState) refers to oled.o(.data) for GuiBorder
-    tetris.o(i.Tetris_InitializeGameState) refers to tetris.o(.bss) for grid
+    tetris.o(i.Tetris_InitializeGameState) refers to tetris.o(.bss) for Tetris_GameGrid
     tetris.o(i.Tetris_MainGameLoop) refers to tetris.o(i.Tetris_InitializeGameState) for Tetris_InitializeGameState
     tetris.o(i.Tetris_MainGameLoop) refers to tetris.o(i.Tetris_Draw) for Tetris_Draw
+    tetris.o(i.Tetris_MainGameLoop) refers to tetris.o(.bss) for Tetris_GameGrid
     bsp_gpio_led.o(i.LED_GPIO_Config) refers to stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd) for RCC_APB2PeriphClockCmd
     bsp_gpio_led.o(i.LED_GPIO_Config) refers to stm32f10x_gpio.o(i.GPIO_SetBits) for GPIO_SetBits
     bsp_gpio_led.o(i.LED_GPIO_Config) refers to stm32f10x_gpio.o(i.GPIO_Init) for GPIO_Init
@@ -635,19 +641,20 @@ Image Symbol Table
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
     ../clib/../cmprslib/zerorunl2.c          0x00000000   Number         0  __dczerorl2.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
     ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\arm\startup_stm32f10x_md.s 0x00000000   Number         0  startup_stm32f10x_md.o ABSOLUTE
     ..\Libraries\STM32F10x_StdPeriph_Driver\src\misc.c 0x00000000   Number         0  misc.o ABSOLUTE
     ..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_adc.c 0x00000000   Number         0  stm32f10x_adc.o ABSOLUTE
@@ -694,53 +701,56 @@ Image Symbol Table
     .ARM.Collect$$$$00002712                 0x080000fc   Section        4  entry2.o(.ARM.Collect$$$$00002712)
     __lit__00000000                          0x080000fc   Data           4  entry2.o(.ARM.Collect$$$$00002712)
     .text                                    0x08000100   Section       36  startup_stm32f10x_md.o(.text)
-    .text                                    0x08000124   Section       36  init.o(.text)
-    .text                                    0x08000148   Section        0  __dczerorl2.o(.text)
-    i.BusFault_Handler                       0x0800019e   Section        0  stm32f10x_it.o(i.BusFault_Handler)
-    i.DebugMon_Handler                       0x080001a2   Section        0  stm32f10x_it.o(i.DebugMon_Handler)
-    i.GPIO_Init                              0x080001a4   Section        0  stm32f10x_gpio.o(i.GPIO_Init)
-    i.GPIO_ResetBits                         0x080002ba   Section        0  stm32f10x_gpio.o(i.GPIO_ResetBits)
-    i.GPIO_SetBits                           0x080002be   Section        0  stm32f10x_gpio.o(i.GPIO_SetBits)
-    i.HardFault_Handler                      0x080002c2   Section        0  stm32f10x_it.o(i.HardFault_Handler)
-    i.IIC_Delay                              0x080002c6   Section        0  bsp_iic_debug.o(i.IIC_Delay)
-    IIC_Delay                                0x080002c7   Thumb Code    14  bsp_iic_debug.o(i.IIC_Delay)
-    i.IIC_GPIO_Config                        0x080002d4   Section        0  bsp_iic_debug.o(i.IIC_GPIO_Config)
-    i.IIC_SendByte                           0x08000300   Section        0  bsp_iic_debug.o(i.IIC_SendByte)
-    i.IIC_Start                              0x0800035c   Section        0  bsp_iic_debug.o(i.IIC_Start)
-    i.IIC_Stop                               0x08000388   Section        0  bsp_iic_debug.o(i.IIC_Stop)
-    i.IIC_Wait_ACK                           0x080003ac   Section        0  bsp_iic_debug.o(i.IIC_Wait_ACK)
-    i.LED_GPIO_Config                        0x080003ec   Section        0  bsp_gpio_led.o(i.LED_GPIO_Config)
-    i.LED_OFF                                0x08000478   Section        0  bsp_gpio_led.o(i.LED_OFF)
-    i.LED_ON                                 0x08000488   Section        0  bsp_gpio_led.o(i.LED_ON)
-    i.MemManage_Handler                      0x08000498   Section        0  stm32f10x_it.o(i.MemManage_Handler)
-    i.NMI_Handler                            0x0800049c   Section        0  stm32f10x_it.o(i.NMI_Handler)
-    i.OLED_DrawPic                           0x080004a0   Section        0  oled.o(i.OLED_DrawPic)
-    i.OLED_ForceUpdateScreen                 0x080005d0   Section        0  oled.o(i.OLED_ForceUpdateScreen)
-    i.OLED_Initialize                        0x08000600   Section        0  oled.o(i.OLED_Initialize)
-    i.OLED_UpdateScreen                      0x080007a8   Section        0  oled.o(i.OLED_UpdateScreen)
-    i.PendSV_Handler                         0x080008f4   Section        0  stm32f10x_it.o(i.PendSV_Handler)
-    i.RCC_APB2PeriphClockCmd                 0x080008f8   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    i.SVC_Handler                            0x08000918   Section        0  stm32f10x_it.o(i.SVC_Handler)
-    i.SetSysClock                            0x0800091a   Section        0  system_stm32f10x.o(i.SetSysClock)
-    SetSysClock                              0x0800091b   Thumb Code     8  system_stm32f10x.o(i.SetSysClock)
-    i.SetSysClockTo72                        0x08000924   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
-    SetSysClockTo72                          0x08000925   Thumb Code   214  system_stm32f10x.o(i.SetSysClockTo72)
-    i.SysTick_Handler                        0x08000a04   Section        0  stm32f10x_it.o(i.SysTick_Handler)
-    i.SystemInit                             0x08000a08   Section        0  system_stm32f10x.o(i.SystemInit)
-    i.Tetris_Draw                            0x08000a68   Section        0  tetris.o(i.Tetris_Draw)
-    i.Tetris_InitializeGameState             0x08000a70   Section        0  tetris.o(i.Tetris_InitializeGameState)
-    i.Tetris_MainGameLoop                    0x08000adc   Section        0  tetris.o(i.Tetris_MainGameLoop)
-    i.UsageFault_Handler                     0x08000af0   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
-    i.__scatterload_copy                     0x08000af4   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x08000b02   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x08000b04   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.exception                              0x08000b14   Section        0  main.o(i.exception)
-    i.main                                   0x08000b34   Section        0  main.o(i.main)
+    .text                                    0x08000124   Section        0  llshl.o(.text)
+    .text                                    0x08000144   Section       36  init.o(.text)
+    .text                                    0x08000168   Section        0  __dczerorl2.o(.text)
+    i.BusFault_Handler                       0x080001be   Section        0  stm32f10x_it.o(i.BusFault_Handler)
+    i.DebugMon_Handler                       0x080001c2   Section        0  stm32f10x_it.o(i.DebugMon_Handler)
+    i.GPIO_Init                              0x080001c4   Section        0  stm32f10x_gpio.o(i.GPIO_Init)
+    i.GPIO_ResetBits                         0x080002da   Section        0  stm32f10x_gpio.o(i.GPIO_ResetBits)
+    i.GPIO_SetBits                           0x080002de   Section        0  stm32f10x_gpio.o(i.GPIO_SetBits)
+    i.HardFault_Handler                      0x080002e2   Section        0  stm32f10x_it.o(i.HardFault_Handler)
+    i.IIC_Delay                              0x080002e6   Section        0  bsp_iic_debug.o(i.IIC_Delay)
+    IIC_Delay                                0x080002e7   Thumb Code    14  bsp_iic_debug.o(i.IIC_Delay)
+    i.IIC_GPIO_Config                        0x080002f4   Section        0  bsp_iic_debug.o(i.IIC_GPIO_Config)
+    i.IIC_SendByte                           0x08000320   Section        0  bsp_iic_debug.o(i.IIC_SendByte)
+    i.IIC_Start                              0x0800037c   Section        0  bsp_iic_debug.o(i.IIC_Start)
+    i.IIC_Stop                               0x080003a8   Section        0  bsp_iic_debug.o(i.IIC_Stop)
+    i.IIC_Wait_ACK                           0x080003cc   Section        0  bsp_iic_debug.o(i.IIC_Wait_ACK)
+    i.LED_GPIO_Config                        0x0800040c   Section        0  bsp_gpio_led.o(i.LED_GPIO_Config)
+    i.LED_OFF                                0x08000498   Section        0  bsp_gpio_led.o(i.LED_OFF)
+    i.LED_ON                                 0x080004a8   Section        0  bsp_gpio_led.o(i.LED_ON)
+    i.MemManage_Handler                      0x080004b8   Section        0  stm32f10x_it.o(i.MemManage_Handler)
+    i.NMI_Handler                            0x080004bc   Section        0  stm32f10x_it.o(i.NMI_Handler)
+    i.OLED_DrawPic                           0x080004c0   Section        0  oled.o(i.OLED_DrawPic)
+    i.OLED_ForceUpdateScreen                 0x080005f0   Section        0  oled.o(i.OLED_ForceUpdateScreen)
+    i.OLED_Initialize                        0x08000620   Section        0  oled.o(i.OLED_Initialize)
+    i.OLED_UpdateScreen                      0x080007c8   Section        0  oled.o(i.OLED_UpdateScreen)
+    i.PendSV_Handler                         0x08000918   Section        0  stm32f10x_it.o(i.PendSV_Handler)
+    i.RCC_APB2PeriphClockCmd                 0x0800091c   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    i.SVC_Handler                            0x0800093c   Section        0  stm32f10x_it.o(i.SVC_Handler)
+    i.SetSysClock                            0x0800093e   Section        0  system_stm32f10x.o(i.SetSysClock)
+    SetSysClock                              0x0800093f   Thumb Code     8  system_stm32f10x.o(i.SetSysClock)
+    i.SetSysClockTo72                        0x08000948   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
+    SetSysClockTo72                          0x08000949   Thumb Code   214  system_stm32f10x.o(i.SetSysClockTo72)
+    i.SysTick_Handler                        0x08000a28   Section        0  stm32f10x_it.o(i.SysTick_Handler)
+    i.SystemInit                             0x08000a2c   Section        0  system_stm32f10x.o(i.SystemInit)
+    i.Tetris_CalculateGridLine               0x08000a8c   Section        0  tetris.o(i.Tetris_CalculateGridLine)
+    i.Tetris_Draw                            0x08000bac   Section        0  tetris.o(i.Tetris_Draw)
+    i.Tetris_InitializeGameState             0x08000bf0   Section        0  tetris.o(i.Tetris_InitializeGameState)
+    i.Tetris_MainGameLoop                    0x08000c68   Section        0  tetris.o(i.Tetris_MainGameLoop)
+    i.UsageFault_Handler                     0x08000c98   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
+    i.__scatterload_copy                     0x08000c9c   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x08000caa   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x08000cac   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.exception                              0x08000cbc   Section        0  main.o(i.exception)
+    i.main                                   0x08000cdc   Section        0  main.o(i.main)
+    .constdata                               0x08000d38   Section      179  tetris.o(.constdata)
     .data                                    0x20000000   Section        4  bsp_iic_debug.o(.data)
     .data                                    0x20000004   Section     1024  oled.o(.data)
-    .bss                                     0x20000404   Section      200  tetris.o(.bss)
-    .bss                                     0x200004cc   Section     1152  oled.o(.bss)
-    STACK                                    0x20000950   Section     1024  startup_stm32f10x_md.o(STACK)
+    .bss                                     0x20000404   Section       40  tetris.o(.bss)
+    .bss                                     0x20000430   Section     1040  oled.o(.bss)
+    STACK                                    0x20000840   Section     1024  startup_stm32f10x_md.o(STACK)
 
     Global Symbols
 
@@ -808,52 +818,64 @@ Image Symbol Table
     USB_HP_CAN1_TX_IRQHandler                0x0800011b   Thumb Code     0  startup_stm32f10x_md.o(.text)
     USB_LP_CAN1_RX0_IRQHandler               0x0800011b   Thumb Code     0  startup_stm32f10x_md.o(.text)
     WWDG_IRQHandler                          0x0800011b   Thumb Code     0  startup_stm32f10x_md.o(.text)
-    __scatterload                            0x08000125   Thumb Code    28  init.o(.text)
-    __scatterload_rt2                        0x08000125   Thumb Code     0  init.o(.text)
-    __decompress                             0x08000149   Thumb Code     0  __dczerorl2.o(.text)
-    __decompress1                            0x08000149   Thumb Code    86  __dczerorl2.o(.text)
-    BusFault_Handler                         0x0800019f   Thumb Code     4  stm32f10x_it.o(i.BusFault_Handler)
-    DebugMon_Handler                         0x080001a3   Thumb Code     2  stm32f10x_it.o(i.DebugMon_Handler)
-    GPIO_Init                                0x080001a5   Thumb Code   278  stm32f10x_gpio.o(i.GPIO_Init)
-    GPIO_ResetBits                           0x080002bb   Thumb Code     4  stm32f10x_gpio.o(i.GPIO_ResetBits)
-    GPIO_SetBits                             0x080002bf   Thumb Code     4  stm32f10x_gpio.o(i.GPIO_SetBits)
-    HardFault_Handler                        0x080002c3   Thumb Code     4  stm32f10x_it.o(i.HardFault_Handler)
-    IIC_GPIO_Config                          0x080002d5   Thumb Code    34  bsp_iic_debug.o(i.IIC_GPIO_Config)
-    IIC_SendByte                             0x08000301   Thumb Code    86  bsp_iic_debug.o(i.IIC_SendByte)
-    IIC_Start                                0x0800035d   Thumb Code    40  bsp_iic_debug.o(i.IIC_Start)
-    IIC_Stop                                 0x08000389   Thumb Code    32  bsp_iic_debug.o(i.IIC_Stop)
-    IIC_Wait_ACK                             0x080003ad   Thumb Code    60  bsp_iic_debug.o(i.IIC_Wait_ACK)
-    LED_GPIO_Config                          0x080003ed   Thumb Code   134  bsp_gpio_led.o(i.LED_GPIO_Config)
-    LED_OFF                                  0x08000479   Thumb Code    16  bsp_gpio_led.o(i.LED_OFF)
-    LED_ON                                   0x08000489   Thumb Code    16  bsp_gpio_led.o(i.LED_ON)
-    MemManage_Handler                        0x08000499   Thumb Code     4  stm32f10x_it.o(i.MemManage_Handler)
-    NMI_Handler                              0x0800049d   Thumb Code     2  stm32f10x_it.o(i.NMI_Handler)
-    OLED_DrawPic                             0x080004a1   Thumb Code   268  oled.o(i.OLED_DrawPic)
-    OLED_ForceUpdateScreen                   0x080005d1   Thumb Code    38  oled.o(i.OLED_ForceUpdateScreen)
-    OLED_Initialize                          0x08000601   Thumb Code   422  oled.o(i.OLED_Initialize)
-    OLED_UpdateScreen                        0x080007a9   Thumb Code   324  oled.o(i.OLED_UpdateScreen)
-    PendSV_Handler                           0x080008f5   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
-    RCC_APB2PeriphClockCmd                   0x080008f9   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    SVC_Handler                              0x08000919   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
-    SysTick_Handler                          0x08000a05   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
-    SystemInit                               0x08000a09   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
-    Tetris_Draw                              0x08000a69   Thumb Code     8  tetris.o(i.Tetris_Draw)
-    Tetris_InitializeGameState               0x08000a71   Thumb Code    92  tetris.o(i.Tetris_InitializeGameState)
-    Tetris_MainGameLoop                      0x08000add   Thumb Code    20  tetris.o(i.Tetris_MainGameLoop)
-    UsageFault_Handler                       0x08000af1   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
-    __scatterload_copy                       0x08000af5   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x08000b03   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x08000b05   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    exception                                0x08000b15   Thumb Code    28  main.o(i.exception)
-    main                                     0x08000b35   Thumb Code    80  main.o(i.main)
-    Region$$Table$$Base                      0x08000b8c   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08000bac   Number         0  anon$$obj.o(Region$$Table)
+    __aeabi_llsl                             0x08000125   Thumb Code    30  llshl.o(.text)
+    _ll_shift_l                              0x08000125   Thumb Code     0  llshl.o(.text)
+    __scatterload                            0x08000145   Thumb Code    28  init.o(.text)
+    __scatterload_rt2                        0x08000145   Thumb Code     0  init.o(.text)
+    __decompress                             0x08000169   Thumb Code     0  __dczerorl2.o(.text)
+    __decompress1                            0x08000169   Thumb Code    86  __dczerorl2.o(.text)
+    BusFault_Handler                         0x080001bf   Thumb Code     4  stm32f10x_it.o(i.BusFault_Handler)
+    DebugMon_Handler                         0x080001c3   Thumb Code     2  stm32f10x_it.o(i.DebugMon_Handler)
+    GPIO_Init                                0x080001c5   Thumb Code   278  stm32f10x_gpio.o(i.GPIO_Init)
+    GPIO_ResetBits                           0x080002db   Thumb Code     4  stm32f10x_gpio.o(i.GPIO_ResetBits)
+    GPIO_SetBits                             0x080002df   Thumb Code     4  stm32f10x_gpio.o(i.GPIO_SetBits)
+    HardFault_Handler                        0x080002e3   Thumb Code     4  stm32f10x_it.o(i.HardFault_Handler)
+    IIC_GPIO_Config                          0x080002f5   Thumb Code    34  bsp_iic_debug.o(i.IIC_GPIO_Config)
+    IIC_SendByte                             0x08000321   Thumb Code    86  bsp_iic_debug.o(i.IIC_SendByte)
+    IIC_Start                                0x0800037d   Thumb Code    40  bsp_iic_debug.o(i.IIC_Start)
+    IIC_Stop                                 0x080003a9   Thumb Code    32  bsp_iic_debug.o(i.IIC_Stop)
+    IIC_Wait_ACK                             0x080003cd   Thumb Code    60  bsp_iic_debug.o(i.IIC_Wait_ACK)
+    LED_GPIO_Config                          0x0800040d   Thumb Code   134  bsp_gpio_led.o(i.LED_GPIO_Config)
+    LED_OFF                                  0x08000499   Thumb Code    16  bsp_gpio_led.o(i.LED_OFF)
+    LED_ON                                   0x080004a9   Thumb Code    16  bsp_gpio_led.o(i.LED_ON)
+    MemManage_Handler                        0x080004b9   Thumb Code     4  stm32f10x_it.o(i.MemManage_Handler)
+    NMI_Handler                              0x080004bd   Thumb Code     2  stm32f10x_it.o(i.NMI_Handler)
+    OLED_DrawPic                             0x080004c1   Thumb Code   268  oled.o(i.OLED_DrawPic)
+    OLED_ForceUpdateScreen                   0x080005f1   Thumb Code    38  oled.o(i.OLED_ForceUpdateScreen)
+    OLED_Initialize                          0x08000621   Thumb Code   422  oled.o(i.OLED_Initialize)
+    OLED_UpdateScreen                        0x080007c9   Thumb Code   326  oled.o(i.OLED_UpdateScreen)
+    PendSV_Handler                           0x08000919   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
+    RCC_APB2PeriphClockCmd                   0x0800091d   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    SVC_Handler                              0x0800093d   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
+    SysTick_Handler                          0x08000a29   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
+    SystemInit                               0x08000a2d   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
+    Tetris_CalculateGridLine                 0x08000a8d   Thumb Code   270  tetris.o(i.Tetris_CalculateGridLine)
+    Tetris_Draw                              0x08000bad   Thumb Code    64  tetris.o(i.Tetris_Draw)
+    Tetris_InitializeGameState               0x08000bf1   Thumb Code   108  tetris.o(i.Tetris_InitializeGameState)
+    Tetris_MainGameLoop                      0x08000c69   Thumb Code    44  tetris.o(i.Tetris_MainGameLoop)
+    UsageFault_Handler                       0x08000c99   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
+    __scatterload_copy                       0x08000c9d   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x08000cab   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x08000cad   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    exception                                0x08000cbd   Thumb Code    28  main.o(i.exception)
+    main                                     0x08000cdd   Thumb Code    80  main.o(i.main)
+    G_GridCells                              0x08000d38   Data          80  tetris.o(.constdata)
+    G_GridCellMask                           0x08000d88   Data           8  tetris.o(.constdata)
+    G_BlockPreviews                          0x08000d90   Data          56  tetris.o(.constdata)
+    G_BlockPreviewStart                      0x08000dc8   Data           1  tetris.o(.constdata)
+    G_NextPreviewShift                       0x08000dc9   Data           1  tetris.o(.constdata)
+    G_SavePreviewShift                       0x08000dca   Data           1  tetris.o(.constdata)
+    G_Nums                                   0x08000dcb   Data          30  tetris.o(.constdata)
+    G_NumsMask                               0x08000de9   Data           1  tetris.o(.constdata)
+    G_NumsShift                              0x08000dea   Data           1  tetris.o(.constdata)
+    Region$$Table$$Base                      0x08000dec   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08000e0c   Number         0  anon$$obj.o(Region$$Table)
     gpio_initstruct                          0x20000000   Data           4  bsp_iic_debug.o(.data)
     GuiBorder                                0x20000004   Data        1024  oled.o(.data)
-    grid                                     0x20000404   Data         200  tetris.o(.bss)
-    scr_cache                                0x200004cc   Data        1024  oled.o(.bss)
-    scr_dirty                                0x200008cc   Data         128  oled.o(.bss)
-    __initial_sp                             0x20000d50   Data           0  startup_stm32f10x_md.o(STACK)
+    Tetris_GameGrid                          0x20000404   Data          40  tetris.o(.bss)
+    scr_cache                                0x20000430   Data        1024  oled.o(.bss)
+    scr_dirty                                0x20000830   Data          16  oled.o(.bss)
+    __initial_sp                             0x20000c40   Data           0  startup_stm32f10x_md.o(STACK)
 
 
 
@@ -863,81 +885,87 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00000fb0, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00000c48])
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00001210, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00000ea8])
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000bac, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000e0c, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000000ec   Data   RO            3    RESET               startup_stm32f10x_md.o
-    0x080000ec   0x080000ec   0x00000000   Code   RO         3358  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x080000ec   0x080000ec   0x00000004   Code   RO         3361    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x080000f0   0x080000f0   0x00000004   Code   RO         3364    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3366    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3368    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x080000f4   0x080000f4   0x00000008   Code   RO         3369    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         3371    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         3373    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x080000fc   0x080000fc   0x00000004   Code   RO         3362    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x080000ec   0x080000ec   0x00000000   Code   RO         3365  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x080000ec   0x080000ec   0x00000004   Code   RO         3370    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x080000f0   0x080000f0   0x00000004   Code   RO         3373    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3375    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3377    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x080000f4   0x080000f4   0x00000008   Code   RO         3378    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         3380    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         3382    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x080000fc   0x080000fc   0x00000004   Code   RO         3371    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x08000100   0x08000100   0x00000024   Code   RO            4    .text               startup_stm32f10x_md.o
-    0x08000124   0x08000124   0x00000024   Code   RO         3375    .text               mc_w.l(init.o)
-    0x08000148   0x08000148   0x00000056   Code   RO         3385    .text               mc_w.l(__dczerorl2.o)
-    0x0800019e   0x0800019e   0x00000004   Code   RO         3131    i.BusFault_Handler  stm32f10x_it.o
-    0x080001a2   0x080001a2   0x00000002   Code   RO         3132    i.DebugMon_Handler  stm32f10x_it.o
-    0x080001a4   0x080001a4   0x00000116   Code   RO         1282    i.GPIO_Init         stm32f10x_gpio.o
-    0x080002ba   0x080002ba   0x00000004   Code   RO         1289    i.GPIO_ResetBits    stm32f10x_gpio.o
-    0x080002be   0x080002be   0x00000004   Code   RO         1290    i.GPIO_SetBits      stm32f10x_gpio.o
-    0x080002c2   0x080002c2   0x00000004   Code   RO         3133    i.HardFault_Handler  stm32f10x_it.o
-    0x080002c6   0x080002c6   0x0000000e   Code   RO         3247    i.IIC_Delay         bsp_iic_debug.o
-    0x080002d4   0x080002d4   0x0000002c   Code   RO         3248    i.IIC_GPIO_Config   bsp_iic_debug.o
-    0x08000300   0x08000300   0x0000005c   Code   RO         3250    i.IIC_SendByte      bsp_iic_debug.o
-    0x0800035c   0x0800035c   0x0000002c   Code   RO         3251    i.IIC_Start         bsp_iic_debug.o
-    0x08000388   0x08000388   0x00000024   Code   RO         3252    i.IIC_Stop          bsp_iic_debug.o
-    0x080003ac   0x080003ac   0x00000040   Code   RO         3253    i.IIC_Wait_ACK      bsp_iic_debug.o
-    0x080003ec   0x080003ec   0x0000008c   Code   RO         3222    i.LED_GPIO_Config   bsp_gpio_led.o
-    0x08000478   0x08000478   0x00000010   Code   RO         3223    i.LED_OFF           bsp_gpio_led.o
-    0x08000488   0x08000488   0x00000010   Code   RO         3224    i.LED_ON            bsp_gpio_led.o
-    0x08000498   0x08000498   0x00000004   Code   RO         3134    i.MemManage_Handler  stm32f10x_it.o
-    0x0800049c   0x0800049c   0x00000002   Code   RO         3135    i.NMI_Handler       stm32f10x_it.o
-    0x0800049e   0x0800049e   0x00000002   PAD
-    0x080004a0   0x080004a0   0x00000130   Code   RO         3304    i.OLED_DrawPic      oled.o
-    0x080005d0   0x080005d0   0x00000030   Code   RO         3305    i.OLED_ForceUpdateScreen  oled.o
-    0x08000600   0x08000600   0x000001a6   Code   RO         3306    i.OLED_Initialize   oled.o
-    0x080007a6   0x080007a6   0x00000002   PAD
-    0x080007a8   0x080007a8   0x0000014c   Code   RO         3307    i.OLED_UpdateScreen  oled.o
-    0x080008f4   0x080008f4   0x00000002   Code   RO         3136    i.PendSV_Handler    stm32f10x_it.o
-    0x080008f6   0x080008f6   0x00000002   PAD
-    0x080008f8   0x080008f8   0x00000020   Code   RO         1700    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
-    0x08000918   0x08000918   0x00000002   Code   RO         3137    i.SVC_Handler       stm32f10x_it.o
-    0x0800091a   0x0800091a   0x00000008   Code   RO           10    i.SetSysClock       system_stm32f10x.o
-    0x08000922   0x08000922   0x00000002   PAD
-    0x08000924   0x08000924   0x000000e0   Code   RO           11    i.SetSysClockTo72   system_stm32f10x.o
-    0x08000a04   0x08000a04   0x00000002   Code   RO         3138    i.SysTick_Handler   stm32f10x_it.o
-    0x08000a06   0x08000a06   0x00000002   PAD
-    0x08000a08   0x08000a08   0x00000060   Code   RO           13    i.SystemInit        system_stm32f10x.o
-    0x08000a68   0x08000a68   0x00000008   Code   RO         3194    i.Tetris_Draw       tetris.o
-    0x08000a70   0x08000a70   0x0000006c   Code   RO         3195    i.Tetris_InitializeGameState  tetris.o
-    0x08000adc   0x08000adc   0x00000014   Code   RO         3196    i.Tetris_MainGameLoop  tetris.o
-    0x08000af0   0x08000af0   0x00000004   Code   RO         3139    i.UsageFault_Handler  stm32f10x_it.o
-    0x08000af4   0x08000af4   0x0000000e   Code   RO         3379    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x08000b02   0x08000b02   0x00000002   Code   RO         3380    i.__scatterload_null  mc_w.l(handlers.o)
-    0x08000b04   0x08000b04   0x0000000e   Code   RO         3381    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x08000b12   0x08000b12   0x00000002   PAD
-    0x08000b14   0x08000b14   0x00000020   Code   RO         3098    i.exception         main.o
-    0x08000b34   0x08000b34   0x00000058   Code   RO         3099    i.main              main.o
-    0x08000b8c   0x08000b8c   0x00000020   Data   RO         3377    Region$$Table       anon$$obj.o
+    0x08000124   0x08000124   0x0000001e   Code   RO         3368    .text               mc_w.l(llshl.o)
+    0x08000142   0x08000142   0x00000002   PAD
+    0x08000144   0x08000144   0x00000024   Code   RO         3384    .text               mc_w.l(init.o)
+    0x08000168   0x08000168   0x00000056   Code   RO         3394    .text               mc_w.l(__dczerorl2.o)
+    0x080001be   0x080001be   0x00000004   Code   RO         3131    i.BusFault_Handler  stm32f10x_it.o
+    0x080001c2   0x080001c2   0x00000002   Code   RO         3132    i.DebugMon_Handler  stm32f10x_it.o
+    0x080001c4   0x080001c4   0x00000116   Code   RO         1282    i.GPIO_Init         stm32f10x_gpio.o
+    0x080002da   0x080002da   0x00000004   Code   RO         1289    i.GPIO_ResetBits    stm32f10x_gpio.o
+    0x080002de   0x080002de   0x00000004   Code   RO         1290    i.GPIO_SetBits      stm32f10x_gpio.o
+    0x080002e2   0x080002e2   0x00000004   Code   RO         3133    i.HardFault_Handler  stm32f10x_it.o
+    0x080002e6   0x080002e6   0x0000000e   Code   RO         3254    i.IIC_Delay         bsp_iic_debug.o
+    0x080002f4   0x080002f4   0x0000002c   Code   RO         3255    i.IIC_GPIO_Config   bsp_iic_debug.o
+    0x08000320   0x08000320   0x0000005c   Code   RO         3257    i.IIC_SendByte      bsp_iic_debug.o
+    0x0800037c   0x0800037c   0x0000002c   Code   RO         3258    i.IIC_Start         bsp_iic_debug.o
+    0x080003a8   0x080003a8   0x00000024   Code   RO         3259    i.IIC_Stop          bsp_iic_debug.o
+    0x080003cc   0x080003cc   0x00000040   Code   RO         3260    i.IIC_Wait_ACK      bsp_iic_debug.o
+    0x0800040c   0x0800040c   0x0000008c   Code   RO         3229    i.LED_GPIO_Config   bsp_gpio_led.o
+    0x08000498   0x08000498   0x00000010   Code   RO         3230    i.LED_OFF           bsp_gpio_led.o
+    0x080004a8   0x080004a8   0x00000010   Code   RO         3231    i.LED_ON            bsp_gpio_led.o
+    0x080004b8   0x080004b8   0x00000004   Code   RO         3134    i.MemManage_Handler  stm32f10x_it.o
+    0x080004bc   0x080004bc   0x00000002   Code   RO         3135    i.NMI_Handler       stm32f10x_it.o
+    0x080004be   0x080004be   0x00000002   PAD
+    0x080004c0   0x080004c0   0x00000130   Code   RO         3311    i.OLED_DrawPic      oled.o
+    0x080005f0   0x080005f0   0x00000030   Code   RO         3312    i.OLED_ForceUpdateScreen  oled.o
+    0x08000620   0x08000620   0x000001a6   Code   RO         3313    i.OLED_Initialize   oled.o
+    0x080007c6   0x080007c6   0x00000002   PAD
+    0x080007c8   0x080007c8   0x00000150   Code   RO         3314    i.OLED_UpdateScreen  oled.o
+    0x08000918   0x08000918   0x00000002   Code   RO         3136    i.PendSV_Handler    stm32f10x_it.o
+    0x0800091a   0x0800091a   0x00000002   PAD
+    0x0800091c   0x0800091c   0x00000020   Code   RO         1700    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
+    0x0800093c   0x0800093c   0x00000002   Code   RO         3137    i.SVC_Handler       stm32f10x_it.o
+    0x0800093e   0x0800093e   0x00000008   Code   RO           10    i.SetSysClock       system_stm32f10x.o
+    0x08000946   0x08000946   0x00000002   PAD
+    0x08000948   0x08000948   0x000000e0   Code   RO           11    i.SetSysClockTo72   system_stm32f10x.o
+    0x08000a28   0x08000a28   0x00000002   Code   RO         3138    i.SysTick_Handler   stm32f10x_it.o
+    0x08000a2a   0x08000a2a   0x00000002   PAD
+    0x08000a2c   0x08000a2c   0x00000060   Code   RO           13    i.SystemInit        system_stm32f10x.o
+    0x08000a8c   0x08000a8c   0x00000120   Code   RO         3194    i.Tetris_CalculateGridLine  tetris.o
+    0x08000bac   0x08000bac   0x00000044   Code   RO         3195    i.Tetris_Draw       tetris.o
+    0x08000bf0   0x08000bf0   0x00000078   Code   RO         3196    i.Tetris_InitializeGameState  tetris.o
+    0x08000c68   0x08000c68   0x00000030   Code   RO         3197    i.Tetris_MainGameLoop  tetris.o
+    0x08000c98   0x08000c98   0x00000004   Code   RO         3139    i.UsageFault_Handler  stm32f10x_it.o
+    0x08000c9c   0x08000c9c   0x0000000e   Code   RO         3388    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x08000caa   0x08000caa   0x00000002   Code   RO         3389    i.__scatterload_null  mc_w.l(handlers.o)
+    0x08000cac   0x08000cac   0x0000000e   Code   RO         3390    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08000cba   0x08000cba   0x00000002   PAD
+    0x08000cbc   0x08000cbc   0x00000020   Code   RO         3098    i.exception         main.o
+    0x08000cdc   0x08000cdc   0x00000058   Code   RO         3099    i.main              main.o
+    0x08000d34   0x08000d34   0x00000004   PAD
+    0x08000d38   0x08000d38   0x000000b3   Data   RO         3199    .constdata          tetris.o
+    0x08000deb   0x08000deb   0x00000001   PAD
+    0x08000dec   0x08000dec   0x00000020   Data   RO         3386    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08000bac, Size: 0x00000d50, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x0000009c])
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08000e0c, Size: 0x00000c40, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x0000009c])
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   COMPRESSED   0x00000004   Data   RW         3255    .data               bsp_iic_debug.o
-    0x20000004   COMPRESSED   0x00000400   Data   RW         3309    .data               oled.o
-    0x20000404        -       0x000000c8   Zero   RW         3197    .bss                tetris.o
-    0x200004cc        -       0x00000480   Zero   RW         3308    .bss                oled.o
-    0x2000094c   COMPRESSED   0x00000004   PAD
-    0x20000950        -       0x00000400   Zero   RW            1    STACK               startup_stm32f10x_md.o
+    0x20000000   COMPRESSED   0x00000004   Data   RW         3262    .data               bsp_iic_debug.o
+    0x20000004   COMPRESSED   0x00000400   Data   RW         3316    .data               oled.o
+    0x20000404        -       0x00000028   Zero   RW         3198    .bss                tetris.o
+    0x2000042c   COMPRESSED   0x00000004   PAD
+    0x20000430        -       0x00000410   Zero   RW         3315    .bss                oled.o
+    0x20000840        -       0x00000400   Zero   RW            1    STACK               startup_stm32f10x_md.o
 
 
 ==============================================================================
@@ -950,18 +978,18 @@ Image component sizes
        172          6          0          0          0       1877   bsp_gpio_led.o
        294         28          0          4          0       3136   bsp_iic_debug.o
        120         12          0          0          0        915   main.o
-      1106         54          0       1024       1152       4242   oled.o
+      1110         56          0       1024       1040       3986   oled.o
         36          8        236          0       1024        912   startup_stm32f10x_md.o
        286          0          0          0          0       3124   stm32f10x_gpio.o
         26          0          0          0          0       3650   stm32f10x_it.o
         32          6          0          0          0        589   stm32f10x_rcc.o
        328         28          0          0          0     226149   system_stm32f10x.o
-       136         16          0          0        200       2260   tetris.o
+       524         38        179          0         40       3721   tetris.o
 
     ----------------------------------------------------------------------
-      2546        158        268       1028       2380     246854   Object Totals
+      2942        186        448       1028       2108     248059   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        10          0          0          0          4          0   (incl. Padding)
+        14          4          1          0          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -978,19 +1006,20 @@ Image component sizes
          8          4          0          0          0          0   entry9a.o
         30          0          0          0          0          0   handlers.o
         36          8          0          0          0         68   init.o
+        30          0          0          0          0         68   llshl.o
 
     ----------------------------------------------------------------------
-       174         16          0          0          0         68   Library Totals
-         2          0          0          0          0          0   (incl. Padding)
+       206         16          0          0          0        136   Library Totals
+         4          0          0          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Library Name
 
-       172         16          0          0          0         68   mc_w.l
+       202         16          0          0          0        136   mc_w.l
 
     ----------------------------------------------------------------------
-       174         16          0          0          0         68   Library Totals
+       206         16          0          0          0        136   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -999,15 +1028,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      2720        174        268       1028       2380     245542   Grand Totals
-      2720        174        268        156       2380     245542   ELF Image Totals (compressed)
-      2720        174        268        156          0          0   ROM Totals
+      3148        202        448       1028       2108     246763   Grand Totals
+      3148        202        448        156       2108     246763   ELF Image Totals (compressed)
+      3148        202        448        156          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 2988 (   2.92kB)
-    Total RW  Size (RW Data + ZI Data)              3408 (   3.33kB)
-    Total ROM Size (Code + RO Data + RW Data)       3144 (   3.07kB)
+    Total RO  Size (Code + RO Data)                 3596 (   3.51kB)
+    Total RW  Size (RW Data + ZI Data)              3136 (   3.06kB)
+    Total ROM Size (Code + RO Data + RW Data)       3752 (   3.66kB)
 
 ==============================================================================
 
