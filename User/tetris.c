@@ -4,13 +4,8 @@
 
 #include <stdint.h>
 
-extern uint8_t GuiBorder[];
-
-extern uint64_t scr_cache[128]; // 图像缓存
-extern uint8_t scr_dirty[16];   // 脏标记(每个位代表一个列)
-uint16_t Tetris_GameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
-
-enum BlockType{
+typedef enum{
+    BlockType_None,
     BlockType_I,
     BlockType_T,
     BlockType_O,
@@ -18,7 +13,18 @@ enum BlockType{
     BlockType_S,
     BlockType_J,
     BlockType_L,
-};
+} BlockType;
+
+extern uint8_t GuiBorder[];
+
+extern uint64_t scr_cache[128]; // 图像缓存
+extern uint8_t scr_dirty[16];   // 脏标记(每个位代表一个列)
+uint16_t Tetris_GameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
+uint32_t Tetris_Score;          // 游戏得分
+BlockType Tetris_CurrentBlock;  // 当前正在下落的块
+BlockType Tetris_SavedBlock;    // 被暂存的块
+BlockType Tetris_NextBlock;     // 下一个会出的块
+uint8_t Tetris_ScrDirty;        // 显示更新用脏标记，从低位开始依次表示：score, saved, next
 
 #pragma region 图形们
 
@@ -44,39 +50,40 @@ const uint64_t G_GridCells[10] = {
     0x0001E00000000000,
     0x003C000000000000,
 };
-
-const uint64_t G_GridCellMask =
+const uint64_t G_GridCellMask = 
     0x007FFFFFFFFFFFF0;
+const uint8_t G_GridCellShiftV = 24;
 
-const uint8_t G_BlockPreviews[7][8] = {
+
+const uint8_t G_BlockPreviews[8][8] = {
+    {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},//None
     {0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18},//I
-    {0x00,0x30,0x30,0x3C,0x3C,0x30,0x30,0x00},//T
+    {0x00,0x0C,0x0C,0x3C,0x3C,0x0C,0x0C,0x00},//T
     {0x00,0x00,0x3C,0x3C,0x3C,0x3C,0x00,0x00},//O
-    {0x00,0x0C,0x0C,0x3C,0x3C,0x30,0x30,0x00},//Z
-    {0x00,0x30,0x30,0x3C,0x3C,0x0C,0x0C,0x00},//S
-    {0x00,0x0C,0x0C,0x0C,0x0C,0x3C,0x3C,0x00},//J
-    {0x00,0x30,0x30,0x30,0x30,0x3C,0x3C,0x00},//L
+    {0x00,0x30,0x30,0x3C,0x3C,0x0C,0x0C,0x00},//Z
+    {0x00,0x0C,0x0C,0x3C,0x3C,0x30,0x30,0x00},//S
+    {0x00,0x30,0x30,0x30,0x30,0x3C,0x3C,0x00},//J
+    {0x00,0x0C,0x0C,0x0C,0x0C,0x3C,0x3C,0x00},//L
 };
+const uint8_t G_BlockPreviewShiftV = 10;
+const uint8_t G_NextPreviewShiftH = 23;
+const uint8_t G_SavePreviewShiftH = 5;
 
-const uint8_t G_BlockPreviewStart = 10;
-const uint8_t G_NextPreviewShift = 23;
-const uint8_t G_SavePreviewShift = 5;
 
 const uint8_t G_Nums[10][3] = {
-    {0x3E,0x22,0x3E},//0
-    {0x02,0x3E,0x22},//1
-    {0x3A,0x2A,0x2E},//2
-    {0x3E,0x2A,0x2A},//3
-    {0x3E,0x08,0x38},//4
-    {0x2E,0x2A,0x3A},//5
-    {0x2E,0x2A,0x3E},//6
-    {0x3E,0x20,0x20},//7
-    {0x3E,0x2A,0x3E},//8
-    {0x3E,0x2A,0x3A},//9
+    {0x7C,0x44,0x7C},//0
+    {0x40,0x7C,0x44},//1
+    {0x5C,0x54,0x74},//2
+    {0x7C,0x54,0x54},//3
+    {0x7C,0x10,0x1C},//4
+    {0x74,0x54,0x5C},//5
+    {0x74,0x54,0x7C},//6
+    {0x7C,0x04,0x04},//7
+    {0x7C,0x54,0x7C},//8
+    {0x7C,0x54,0x5C},//9
 };
-
-const uint8_t G_NumsMask = 0xC1;
-const uint8_t G_NumsShift = 56;
+const uint8_t G_NumsMask = 0x7C;
+const uint8_t G_NumsShiftH = 21;
 
 #pragma endregion
 
@@ -93,6 +100,10 @@ void Tetris_MainGameLoop(void)
     Tetris_GameGrid[19] = 1<<2 | 0x8000;
     Tetris_GameGrid[18] = 1<<7 | 0x8000;
     Tetris_GameGrid[5] = 1<<2 | 0x8000;
+    Tetris_Score = 1024357689;
+    Tetris_SavedBlock = BlockType_I;
+    Tetris_NextBlock = BlockType_S;
+    Tetris_ScrDirty = 0x07;
 
     // 游戏主循环
     int gameloop = 1;
@@ -127,13 +138,59 @@ void Tetris_InitializeGameState(void)
         Tetris_GameGrid[i] = 0;
     }
 
-    OLED_ForceUpdateScreen(); // 会同时重置脏标记
+    // 初始化游戏数据
+    Tetris_Score = 0;
+    Tetris_CurrentBlock = Tetris_NextBlock = Tetris_SavedBlock = BlockType_None;
+    Tetris_ScrDirty = 0;
+
+    OLED_ForceUpdateScreen(); // 会同时重置屏幕脏标记
 }
 
 void Tetris_CalculateGridLine(uint8_t h, uint16_t grid);
 void Tetris_Draw(void)
 {
-    // todo 计算画面更新
+    // 更新得分显示
+    if (Tetris_ScrDirty & 0x01)
+    {
+        uint32_t score = Tetris_Score;
+        for (uint8_t i = 0; score != 0 ; i++) // 考虑到一局内分数只会递增而开始时会重置UI，不需要考虑更新更高位的显式
+        {
+            uint8_t n = score%10;
+            for (uint8_t j = 1; j <= 3; j++)
+            {
+                uint8_t scr_h = G_NumsShiftH + i*4 +j;
+                scr_dirty[scr_h/8] |= 0x80>>(scr_h%8);
+                scr_cache[scr_h] |= (uint64_t)G_NumsMask << 56; // 分数显示是反色的
+                scr_cache[scr_h] &= ~((uint64_t)G_Nums[n][j-1] << 56);
+            }
+            score/=10;
+        }
+        
+    }
+
+    // 更新方块预览画面
+    if (Tetris_ScrDirty & 0x02) // SavedBlock
+    {
+        for (uint8_t i = 0; i < 8; i++)
+        {
+            uint8_t scr_h = G_BlockPreviewShiftV+i;
+            scr_dirty[scr_h/8] |= 0x80>>(scr_h%8);
+            scr_cache[scr_h] &= ~((uint64_t)0xFF << G_SavePreviewShiftH);
+            scr_cache[scr_h] |= (uint64_t)G_BlockPreviews[Tetris_SavedBlock][i] << G_SavePreviewShiftH;
+        }
+    }
+    if (Tetris_ScrDirty & 0x04) // NextBlock
+    {
+        for (uint8_t i = 0; i < 8; i++)
+        {
+            uint8_t scr_h = G_BlockPreviewShiftV+i;
+            scr_dirty[scr_h/8] |= 0x80>>(scr_h%8);
+            scr_cache[scr_h] &= ~((uint64_t)0xFF << G_NextPreviewShiftH);
+            scr_cache[scr_h] |= (uint64_t)G_BlockPreviews[Tetris_NextBlock][i] << G_NextPreviewShiftH;
+        }
+    }
+
+    // 更新游戏格子画面
     for (uint8_t i = 0; i < 20; i++)
     {
         if ((Tetris_GameGrid[i] & 0x8000) == 0) continue; // 检查脏标记
@@ -156,8 +213,8 @@ void Tetris_CalculateGridLine(uint8_t h, uint16_t grid)
         if ((grid & 1<<i) == 0) continue;
         line |= G_GridCells[i];
     }
-    uint8_t scr_hb = 24 + (19-h)*5;
-    scr_dirty[scr_hb/8] |= 0x80>>(scr_hb%8);
+    uint8_t scr_hb = G_GridCellShiftV + (19-h)*5;
+    // scr_dirty[scr_hb/8] |= 0x80>>(scr_hb%8);
     for (uint8_t j = 1; j <= 4; j++)
     {
         uint8_t scr_h = scr_hb + j;

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Fire_F103.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Fire_F103.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue Dec 17 23:31:30 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Dec 18 10:04:48 2024
 <BR><P>
 <H3>Maximum Stack Usage =         96 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -426,14 +426,14 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(.text)
 </UL>
-<P><STRONG><a name="[50]"></a>Tetris_CalculateGridLine</STRONG> (Thumb, 270 bytes, Stack size 32 bytes, tetris.o(i.Tetris_CalculateGridLine))
+<P><STRONG><a name="[50]"></a>Tetris_CalculateGridLine</STRONG> (Thumb, 218 bytes, Stack size 32 bytes, tetris.o(i.Tetris_CalculateGridLine))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Tetris_CalculateGridLine
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_Draw
 </UL>
 
-<P><STRONG><a name="[4f]"></a>Tetris_Draw</STRONG> (Thumb, 64 bytes, Stack size 8 bytes, tetris.o(i.Tetris_Draw))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Tetris_Draw &rArr; OLED_UpdateScreen &rArr; IIC_SendByte
+<P><STRONG><a name="[4f]"></a>Tetris_Draw</STRONG> (Thumb, 568 bytes, Stack size 24 bytes, tetris.o(i.Tetris_Draw))
+<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = Tetris_Draw &rArr; OLED_UpdateScreen &rArr; IIC_SendByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_UpdateScreen
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_CalculateGridLine
@@ -441,7 +441,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_MainGameLoop
 </UL>
 
-<P><STRONG><a name="[51]"></a>Tetris_InitializeGameState</STRONG> (Thumb, 108 bytes, Stack size 24 bytes, tetris.o(i.Tetris_InitializeGameState))
+<P><STRONG><a name="[51]"></a>Tetris_InitializeGameState</STRONG> (Thumb, 132 bytes, Stack size 24 bytes, tetris.o(i.Tetris_InitializeGameState))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Tetris_InitializeGameState &rArr; OLED_ForceUpdateScreen &rArr; OLED_DrawPic &rArr; IIC_SendByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
@@ -450,7 +450,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_MainGameLoop
 </UL>
 
-<P><STRONG><a name="[53]"></a>Tetris_MainGameLoop</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, tetris.o(i.Tetris_MainGameLoop))
+<P><STRONG><a name="[53]"></a>Tetris_MainGameLoop</STRONG> (Thumb, 68 bytes, Stack size 8 bytes, tetris.o(i.Tetris_MainGameLoop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = Tetris_MainGameLoop &rArr; Tetris_InitializeGameState &rArr; OLED_ForceUpdateScreen &rArr; OLED_DrawPic &rArr; IIC_SendByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_InitializeGameState
