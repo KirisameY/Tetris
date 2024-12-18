@@ -30,6 +30,9 @@
 ".\objects\bsp_gpio_led.o"
 ".\objects\bsp_iic_debug.o"
 ".\objects\oled.o"
+".\objects\bsp_systick.o"
+".\objects\paj7620u2.o"
+".\objects\input.o"
 --library_type=microlib --strict --scatter ".\Objects\Fire_F103.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

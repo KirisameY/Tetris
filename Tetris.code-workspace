@@ -13,7 +13,10 @@
 			"bsp_gpio_led.h": "c",
 			"iic_extension.h": "c",
 			"main.h": "c",
-			"tetris.h": "c"
+			"tetris.h": "c",
+			"bsp_systick.h": "c",
+			"paj7620u2.h": "c",
+			"stm32f10x_exti.h": "c"
 		}
 	}
 }

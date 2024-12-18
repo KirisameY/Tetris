@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>流水灯</TargetName>
+      <TargetName>Tetris</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pArmCC>5060750::V5.06 update 6 (build 750)::ARMCC</pArmCC>
@@ -552,6 +552,21 @@
               <FileName>oled.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\oled\oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\systick\bsp_systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>paj7620u2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\input\paj7620u2.c</FilePath>
+            </File>
+            <File>
+              <FileName>input.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\input\input.c</FilePath>
             </File>
           </Files>
         </Group>

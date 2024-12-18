@@ -29,7 +29,9 @@
 .\objects\main.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_wwdg.h
 .\objects\main.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
 .\objects\main.o: ..\User\led/bsp_gpio_led.h
+.\objects\main.o: ..\User\systick/bsp_SysTick.h
 .\objects\main.o: ..\User\iic/bsp_iic_debug.h
 .\objects\main.o: ..\User\oled/oled.h
+.\objects\main.o: ..\User\input/input.h
 .\objects\main.o: ..\User\tetris.h
 .\objects\main.o: ..\User\main.h

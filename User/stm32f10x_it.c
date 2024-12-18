@@ -22,6 +22,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "stm32f10x.h"
+#include "systick/bsp_SysTick.h"
+#include "led/bsp_gpio_led.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
@@ -137,6 +140,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
+    TimingDelay_Decrement();
 }
 
 /******************************************************************************/
@@ -145,6 +149,30 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
+
+void EXTI0_IRQHandler(void)
+{
+    RGB_ALL_ON
+    EXTI_ClearITPendingBit(EXTI_Line0);
+    for (uint32_t i = 0x444444; i > 0; i--);    
+    RGB_ALL_OFF
+    for (uint32_t i = 0x444444; i > 0; i--);    
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+    RGB_ALL_ON
+    if (EXTI_GetITStatus(EXTI_Line8) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line8); // 清除中断标志
+        // 处理中断事件
+        RGB_ALL_ON
+    }
+    for (uint32_t i = 0x444444; i > 0; i--);    
+    RGB_ALL_OFF
+    for (uint32_t i = 0x444444; i > 0; i--);  
+}
+
 
 /**
   * @brief  This function handles PPP interrupt request.
