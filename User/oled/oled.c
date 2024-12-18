@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-uint64_t scr_cache[128]; // 图像缓存
-uint8_t scr_dirty[16];     // 脏标记(每个位代表一个列)
+uint64_t scr_Cache[128]; // 图像缓存
+uint8_t scr_Dirty[16];     // 脏标记(每个位代表一个列)
 
 /// @brief 初始化OLED
 /// @param
@@ -35,7 +35,7 @@ void OLED_Initialize(void)
 
     IIC_SEND_N_WAIT(0xA0); // 列映射：segX（自右向左
 
-    IIC_SEND_N_WAIT(0xC8); // COM扫描方向：自下而上
+    IIC_SEND_N_WAIT(0xC8); // COM扫描方向：低位在上
 
     /* ↓这块是底层，没搞懂，直接抄了 */
     /* 设置预充期 */
@@ -144,7 +144,7 @@ void OLED_UpdateScreen(void)
 
     for (uint8_t i = 0; i < 16; i++)
     {
-        if (scr_dirty[i] == 0) 
+        if (scr_Dirty[i] == 0) 
         {
             con = 0;
             continue;
@@ -152,7 +152,7 @@ void OLED_UpdateScreen(void)
 
         for (uint8_t j = 0; j < 8; j++)
         {
-            if ((scr_dirty[i] & (0x80>>j)) == 0) 
+            if ((scr_Dirty[i] & (0x80>>j)) == 0) 
             {
                 con = 0;
                 continue;
@@ -176,12 +176,12 @@ void OLED_UpdateScreen(void)
 
             for (uint8_t k = 0; k < 8; k++)
             {
-                IIC_SEND_N_WAIT(((uint8_t*)(void*)scr_cache)[col*8+k]);
+                IIC_SEND_N_WAIT(((uint8_t*)(void*)scr_Cache)[col*8+k]);
             }
             con = 1;
         }
 
-        scr_dirty[i] = 0; //清除脏标记
+        scr_Dirty[i] = 0; //清除脏标记
     }
 
     IIC_Stop();
@@ -189,10 +189,10 @@ void OLED_UpdateScreen(void)
 
 void OLED_ForceUpdateScreen(void)
 {
-    OLED_DrawPic((uint8_t*)(void*)scr_cache, 0, 8, 0, 128);
+    OLED_DrawPic((uint8_t*)(void*)scr_Cache, 0, 8, 0, 128);
     // 重置图形脏标记:
     for (uint8_t i = 0; i < 16; i++)
     {
-        scr_dirty[i] = 0;
+        scr_Dirty[i] = 0;
     }
 }
