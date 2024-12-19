@@ -113,15 +113,6 @@ void OLED_DrawPic(uint8_t *pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8
     IIC_Stop();
 }
 
-#if _TEST_GUI_AVAILABLE
-/// @brief 绘制测试用UI图像
-/// @param
-void OLED_DrawTestGui(void)
-{
-    OLED_DrawPic(TestGui, 0, 8, 0, 128);
-}
-#endif
-
 /// @brief 绘制UI边框图像
 /// @param
 void OLED_DrawGuiBorder(void)

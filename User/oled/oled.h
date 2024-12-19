@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define _TEST_GUI_AVAILABLE 0
-
 //宏定义
 
 #define OLED_CALL_WR        0x78 //写模式呼叫设备
@@ -20,9 +18,5 @@ void OLED_DrawPic(uint8_t* pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8
 void OLED_DrawGuiBorder(void);
 void OLED_UpdateScreen(void);
 void OLED_ForceUpdateScreen(void);
-
-#if _TEST_GUI_AVAILABLE
-void OLED_DrawTestGui(void);
-#endif
 
 #endif

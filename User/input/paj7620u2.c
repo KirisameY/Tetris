@@ -185,10 +185,6 @@ void PAJ7620U2_HandleInt(void)
 
 static void PAJ7620U2_IntInit(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-
     GPIO_InitTypeDef GPIO_InitInfo;
     NVIC_InitTypeDef NVIC_InitInfo;
     EXTI_InitTypeDef EXTI_InitInfo;
@@ -196,7 +192,7 @@ static void PAJ7620U2_IntInit(void)
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource7);
 
     GPIO_InitInfo.GPIO_Pin = GPIO_Pin_7;
-    GPIO_InitInfo.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitInfo.GPIO_Mode = GPIO_Mode_IPD;
     GPIO_InitInfo.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitInfo);
 
@@ -207,7 +203,7 @@ static void PAJ7620U2_IntInit(void)
     EXTI_Init(&EXTI_InitInfo);
 
     NVIC_InitInfo.NVIC_IRQChannel = EXTI9_5_IRQn;
-    NVIC_InitInfo.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitInfo.NVIC_IRQChannelPreemptionPriority = 2;
     NVIC_InitInfo.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitInfo.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitInfo);

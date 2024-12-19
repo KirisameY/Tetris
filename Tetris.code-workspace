@@ -17,7 +17,10 @@
 			"bsp_systick.h": "c",
 			"paj7620u2.h": "c",
 			"stm32f10x_exti.h": "c",
-			"input.h": "c"
+			"input.h": "c",
+			"stm32f10x_tim.h": "c",
+			"stm32f10x_rcc.h": "c",
+			"led_extension.h": "c"
 		}
 	}
 }

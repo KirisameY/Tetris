@@ -568,6 +568,16 @@
               <FileType>1</FileType>
               <FilePath>..\User\input\input.c</FilePath>
             </File>
+            <File>
+              <FileName>tim2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\tim2\tim2.c</FilePath>
+            </File>
+            <File>
+              <FileName>led_extension.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\led\led_extension.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

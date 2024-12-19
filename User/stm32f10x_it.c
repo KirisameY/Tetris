@@ -23,8 +23,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
 #include "stm32f10x.h"
+#include "stm32f10x_tim.h"
 #include "systick/bsp_SysTick.h"
 #include "led/bsp_gpio_led.h"
+#include "tim2/tim2.h"
+#include "input/input.h"
 #include "input/paj7620u2.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
@@ -151,20 +154,29 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
 
+void TIM2_IRQHandler(void)
+{
+    TIM_ClearITPendingBit(TIM2, TIM_IT_Update); // 清除中断位
+
+    TIM2_IntHandler();
+}
+
 void EXTI9_5_IRQHandler(void)
 {
-    //RGB_ALL_ON
     if (EXTI_GetITStatus(EXTI_Line7) != RESET)
     {
-        for (uint32_t i = 0x100; i > 0; i--);  // 延时消抖
         EXTI_ClearITPendingBit(EXTI_Line7); // 清除中断标志
 
-        // RGB_ALL_ON
         PAJ7620U2_HandleInt();
     }
-    // for (uint32_t i = 0x444444; i > 0; i--);
-    // RGB_ALL_OFF
-    // for (uint32_t i = 0x444444; i > 0; i--);
+
+    if (EXTI_GetITStatus(EXTI_Line6) != RESET)
+    {
+        for (uint32_t i = 0x1024; i > 0; i--);  // 延时消抖
+        EXTI_ClearITPendingBit(EXTI_Line6); // 清除中断标志
+
+        Button_HandleInt();
+    }
 }
 
 

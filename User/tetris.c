@@ -172,11 +172,11 @@ static void _Input(void)
             break;
         case Input_Type_Down:  
             _ypos = MAX(_ypos-1, 0);   
-            _savedBlock = (_savedBlock+6)%8;
+            _savedBlock = (_savedBlock+7)%8;
             break;
         case Input_Type_Left:  
             _xpos = MAX(_xpos-1, 0);  
-            _nextBlock = (_nextBlock+6)%8;
+            _nextBlock = (_nextBlock+7)%8;
             break;
         case Input_Type_Right: 
             _xpos = MIN(_xpos+1, 9);   

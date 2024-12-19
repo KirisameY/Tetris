@@ -6,7 +6,7 @@
   <Header>### uVision Project, (C) Keil Software</Header>
 
   <PrjGuiSettings>
-    <LastAddFilePath>D:\Documents\project\Stm32\Tetris\User\input</LastAddFilePath>
+    <LastAddFilePath>D:\Documents\project\Stm32\Tetris\User\led</LastAddFilePath>
   </PrjGuiSettings>
 
   <ViewPool/>
@@ -1874,7 +1874,7 @@
       </Doc>
       <Doc>
         <Name>..\User\system_stm32f10x.c</Name>
-        <ColumnNumber>2</ColumnNumber>
+        <ColumnNumber>44</ColumnNumber>
         <TopLine>110</TopLine>
         <CurrentLine>120</CurrentLine>
         <Folding>1</Folding>
