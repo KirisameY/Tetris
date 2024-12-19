@@ -191,6 +191,8 @@ static uint8_t PAJ7620U2_Wakeup(void)
     IIC_SEND_N_WAIT(PAJ7620U2_REG_BANK_SEL)
     IIC_SEND_N_WAIT(PAJ7620U2_BANK_0)
 
+    IIC_Start();
+    IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
     IIC_SEND_N_WAIT(0x00)
     IIC_Start();
     IIC_SEND_N_WAIT(PAJ7620U2_CALL_RD)
@@ -215,14 +217,12 @@ static void PAJ7620U2_I2CInit(void)
     {
         IIC_Start();
         IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
-
         IIC_SEND_N_WAIT(InitCmd[i][0])
         IIC_SEND_N_WAIT(InitCmd[i][1])
     }
 
     IIC_Start();
     IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
-
     IIC_SEND_N_WAIT(PAJ7620U2_REG_BANK_SEL)
     IIC_SEND_N_WAIT(PAJ7620U2_BANK_0)
     IIC_Stop();
@@ -242,14 +242,12 @@ static void PAJ7620U2_GestureInit(void)
     {
         IIC_Start();
         IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
-
         IIC_SEND_N_WAIT(GestureInitCmd[i][0])
         IIC_SEND_N_WAIT(GestureInitCmd[i][1])
     }
 
     IIC_Start();
     IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
-
     IIC_SEND_N_WAIT(PAJ7620U2_REG_BANK_SEL)
     IIC_SEND_N_WAIT(PAJ7620U2_BANK_0)
     IIC_Stop();
