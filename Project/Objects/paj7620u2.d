@@ -1,5 +1,6 @@
 .\objects\paj7620u2.o: ..\User\input\paj7620u2.c
 .\objects\paj7620u2.o: ..\User\input\paj7620u2.h
+.\objects\paj7620u2.o: ..\User\input\input.h
 .\objects\paj7620u2.o: ..\User\input\../iic/bsp_iic_debug.h
 .\objects\paj7620u2.o: ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h
 .\objects\paj7620u2.o: ..\Libraries\CMSIS\CM3\CoreSupport\core_cm3.h

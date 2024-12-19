@@ -1,6 +1,7 @@
 #include "tetris.h"
 #include "oled/oled.h"
 #include "led/bsp_gpio_led.h"
+#include "input/input.h"
 #include "main.h"
 
 #include <stdint.h>
@@ -17,6 +18,7 @@ typedef enum{
 } BlockType;
 
 extern uint8_t GuiBorder[];
+extern Input_Type Input_Current;
 
 extern uint64_t scr_Cache[128]; // 图像缓存
 extern uint8_t scr_Dirty[16];   // 脏标记(每个位代表一个列)
@@ -89,7 +91,11 @@ static const uint8_t G_NumsShiftH = 20;
 #pragma endregion
 
 static void _InitializeGameState(void);
+static void _Input(void);
 static void _Draw(void);
+
+//temp
+static uint8_t _xpos, _ypos;
 
 /// @brief 执行游戏的主循环
 /// @param
@@ -101,7 +107,7 @@ void Tetris_MainGameLoop(void)
     _gameGrid[19] = 1<<2 | 0x8000;
     _gameGrid[18] = 1<<7 | 0x8000;
     _gameGrid[5] = 1<<2 | 0x8000;
-    _score = 1024357689;
+    _score = 0;//1024357689;
     _savedBlock = BlockType_I;
     _nextBlock = BlockType_S;
     _scrDirty = 0x07;
@@ -115,9 +121,10 @@ void Tetris_MainGameLoop(void)
         //       时间判定和输入处理后应当立刻执行一次显示更新
         //       输入和时间可以闪一下绿/蓝灯
 
-        _Draw(); // 在最后执行一个绘制帧
+        while(Input_Current == Input_Type_None) {}; //todo: 加入计时后就不要阻塞轮询了
+        _Input();
 
-        while (1) ; // 写完之前暂时阻塞一下循环
+        _Draw(); // 在最后执行一个绘制帧
     }
 }
 
@@ -144,7 +151,46 @@ static void _InitializeGameState(void)
     _currentBlock = _nextBlock = _savedBlock = BlockType_None;
     _scrDirty = 0;
 
+    //temp
+    _xpos = _ypos = 0;
+
     OLED_ForceUpdateScreen(); // 会同时重置scr_dirty
+}
+
+static void _Input(void)
+{
+    //temp 测试输入用
+
+    _gameGrid[_ypos] |= 0x8000;
+    _gameGrid[_ypos] &= ~(1 << _xpos);
+
+    switch (Input_Current)
+    {
+        case Input_Type_Up:    
+            _ypos = MIN(_ypos+1, 19); 
+            _savedBlock = (_savedBlock+1)%8;
+            break;
+        case Input_Type_Down:  
+            _ypos = MAX(_ypos-1, 0);   
+            _savedBlock = (_savedBlock+6)%8;
+            break;
+        case Input_Type_Left:  
+            _xpos = MAX(_xpos-1, 0);  
+            _nextBlock = (_nextBlock+6)%8;
+            break;
+        case Input_Type_Right: 
+            _xpos = MIN(_xpos+1, 9);   
+            _nextBlock = (_nextBlock+1)%8;
+            break;
+        
+        default: break;
+    }
+
+    Input_Clear();
+    _score++;
+    _scrDirty |= 0x07;
+    _gameGrid[_ypos] |= 0x8000;
+    _gameGrid[_ypos] |= 1 << _xpos;
 }
 
 #pragma region 图像更新&绘制

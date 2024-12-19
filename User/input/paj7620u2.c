@@ -1,4 +1,5 @@
 #include "paj7620u2.h"
+#include "input.h"
 #include "../iic/bsp_iic_debug.h"
 #include "../iic/iic_extension.h"
 #include "../systick/bsp_systick.h"
@@ -9,8 +10,6 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "misc.h"
-
-uint8_t PAJ7620U2_int_flag=0;
 
 #pragma region Cmds
 
@@ -107,6 +106,32 @@ const static uint8_t GestureInitCmd[][2]={
 
 #pragma endregion
 
+#pragma region Results
+
+#define BIT(x) 1<<(x)
+
+#define GES_UP              BIT(0) //向上
+#define GES_DOWN            BIT(1) //向下
+#define GES_LEFT            BIT(2) //向左
+#define GES_RIGHT           BIT(3) //向右
+#define GES_FORWARD         BIT(4) //向前
+#define GES_BACKWARD        BIT(5) //向后
+#define GES_CLOCKWISE       BIT(6) //顺时针
+#define GES_COUNT_CLOCKWISE BIT(7) //逆时针
+#define GES_WAVE            BIT(8) //挥动
+
+// #define GES_UP              (1<<(0)) //向上
+// #define GES_DOWN            (1<<(1)) //向下
+// #define GES_LEFT            (1<<(2)) //向左
+// #define GES_RIGHT           (1<<(3)) //向右
+// #define GES_FORWARD         (1<<(4)) //向前
+// #define GES_BACKWARD        (1<<(5)) //向后
+// #define GES_CLOCKWISE       (1<<(6)) //顺时针
+// #define GES_COUNT_CLOCKWISE (1<<(7)) //逆时针
+// #define GES_WAVE            (1<<(8)) //挥动
+
+#pragma endregion
+
 static void PAJ7620U2_IntInit(void);
 static uint8_t PAJ7620U2_Wakeup(void);
 static void PAJ7620U2_I2CInit(void);
@@ -127,23 +152,36 @@ void PAJ7620U2_Init(void)
     //EXTI->SWIER |= EXTI_Line8;
 }
 
-void PAJ7620U2_ClearInt(void)
+void PAJ7620U2_HandleInt(void)
 {
+    uint8_t ges[2];
+
     IIC_Start();
     IIC_SEND_N_WAIT(PAJ7620U2_CALL_WR)
-    // IIC_SEND_N_WAIT(PAJ7620U2_REG_BANK_SEL) // 寄存器0
-    // IIC_SEND_N_WAIT(PAJ7620U2_BANK_0)
     IIC_SEND_N_WAIT(PAJ7620U2_GET_INT_FLAG1) // 导航到中断位
     
     IIC_Start();
     IIC_SEND_N_WAIT(PAJ7620U2_CALL_RD)
-    IIC_ReciveByte();
+    ges[0] = IIC_ReciveByte();
     IIC_ACK(0);
-    IIC_ReciveByte();
+    ges[1] = IIC_ReciveByte() << 8;
     IIC_ACK(1);
 
     IIC_Stop();
+
+    switch ((uint16_t)ges[1]<<8 | ges[0])
+    {
+        case GES_UP:              Input_Set(Input_Type_Down);          break; // 反向映射
+        case GES_DOWN:            Input_Set(Input_Type_Up);            break;
+        case GES_LEFT:            Input_Set(Input_Type_Right);         break;
+        case GES_RIGHT:           Input_Set(Input_Type_Left);          break;
+        case GES_CLOCKWISE:       Input_Set(Input_Type_Clockwise);     break;
+        case GES_COUNT_CLOCKWISE: Input_Set(Input_Type_AntiClockwise); break;
+        default:                                                       break;
+    }
 }
+
+#pragma region init
 
 static void PAJ7620U2_IntInit(void)
 {
@@ -252,3 +290,5 @@ static void PAJ7620U2_GestureInit(void)
     IIC_SEND_N_WAIT(PAJ7620U2_BANK_0)
     IIC_Stop();
 }
+
+#pragma endregion

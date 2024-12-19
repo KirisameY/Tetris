@@ -16,6 +16,6 @@
 // 方法定义
 
 void PAJ7620U2_Init(void);
-void PAJ7620U2_ClearInt(void);
+void PAJ7620U2_HandleInt(void);
 
 #endif

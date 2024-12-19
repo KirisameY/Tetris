@@ -16,7 +16,8 @@
 			"tetris.h": "c",
 			"bsp_systick.h": "c",
 			"paj7620u2.h": "c",
-			"stm32f10x_exti.h": "c"
+			"stm32f10x_exti.h": "c",
+			"input.h": "c"
 		}
 	}
 }

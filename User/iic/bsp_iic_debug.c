@@ -135,7 +135,8 @@ uint8_t IIC_ReciveByte(void)
         IIC_SCL_1;
         IIC_Delay();
         if (IIC_SDA_READ)
-            temp = IIC_SDA_READ << (7 - i);
+            temp = 1 << (7 - i);
+            // temp = IIC_SDA_READ << (7 - i);
         /* 时钟线拉低 从机继续发送数据 */
         IIC_SCL_0;
         /* 等待从机发送下一位数据 */

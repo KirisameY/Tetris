@@ -151,15 +151,6 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
 
-void EXTI0_IRQHandler(void)
-{
-    RGB_ALL_ON
-    EXTI_ClearITPendingBit(EXTI_Line0);
-    for (uint32_t i = 0x444444; i > 0; i--);    
-    RGB_ALL_OFF
-    for (uint32_t i = 0x444444; i > 0; i--);    
-}
-
 void EXTI9_5_IRQHandler(void)
 {
     //RGB_ALL_ON
@@ -168,12 +159,12 @@ void EXTI9_5_IRQHandler(void)
         for (uint32_t i = 0x100; i > 0; i--);  // 延时消抖
         EXTI_ClearITPendingBit(EXTI_Line7); // 清除中断标志
 
-        RGB_ALL_ON
-        PAJ7620U2_ClearInt();
+        // RGB_ALL_ON
+        PAJ7620U2_HandleInt();
     }
-    for (uint32_t i = 0x444444; i > 0; i--);
-    RGB_ALL_OFF
-    for (uint32_t i = 0x444444; i > 0; i--);
+    // for (uint32_t i = 0x444444; i > 0; i--);
+    // RGB_ALL_OFF
+    // for (uint32_t i = 0x444444; i > 0; i--);
 }
 
 

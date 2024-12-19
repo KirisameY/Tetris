@@ -27,17 +27,30 @@ Project File Date:  12/18/2024
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\Arm\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Tetris'
-compiling stm32f10x_it.c...
-compiling paj7620u2.c...
-..\User\input\paj7620u2.c(15): warning:  #161-D: unrecognized #pragma
-  #pragma region Cmds
-..\User\input\paj7620u2.c(108): warning:  #161-D: unrecognized #pragma
+compiling tetris.c...
+..\User\tetris.c(32): warning:  #161-D: unrecognized #pragma
+  #pragma region ?????????
+..\User\tetris.c(91): warning:  #161-D: unrecognized #pragma
   #pragma endregion
-..\User\input\paj7620u2.c: 2 warnings, 0 errors
+..\User\tetris.c(171): warning:  #188-D: enumerated type mixed with another type
+              _savedBlock = (_savedBlock+1)%8;
+..\User\tetris.c(175): warning:  #188-D: enumerated type mixed with another type
+              _savedBlock = (_savedBlock+6)%8;
+..\User\tetris.c(179): warning:  #188-D: enumerated type mixed with another type
+              _nextBlock = (_nextBlock+6)%8;
+..\User\tetris.c(183): warning:  #188-D: enumerated type mixed with another type
+              _nextBlock = (_nextBlock+1)%8;
+..\User\tetris.c(196): warning:  #161-D: unrecognized #pragma
+  #pragma region ????????????&??????
+..\User\tetris.c(276): warning:  #161-D: unrecognized #pragma
+  #pragma endregion
+..\User\tetris.c(27): warning:  #550-D: variable "_currentBlock"  was set but never used
+  static BlockType _currentBlock;  // ????????????????????????
+..\User\tetris.c: 9 warnings, 0 errors
 linking...
-Program Size: Code=5436 RO-data=572 RW-data=1060 ZI-data=2108  
+Program Size: Code=5812 RO-data=572 RW-data=1068 ZI-data=2108  
 FromELF: creating hex file...
-".\Objects\Fire_F103.axf" - 0 Error(s), 2 Warning(s).
+".\Objects\Fire_F103.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 
