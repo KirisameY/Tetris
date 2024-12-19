@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 static int8_t _ledR, _ledG, _ledB;
+
 #define FLASH_TIME 2
 
 void Led_Flash_R(void)

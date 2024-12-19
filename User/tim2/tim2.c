@@ -1,6 +1,7 @@
 #include "tim2.h"
 
-#include "led/led_extension.h"
+#include "../led/led_extension.h"
+#include "../tetris.h"
 
 #include "stm32f10x.h"
 #include "stm32f10x_tim.h"
@@ -33,11 +34,9 @@ void TIM2_Init(void)
     TIM_Cmd(TIM2, ENABLE); // 使能TIM2
 }
 
-int temp = 0;
 
 void TIM2_IntHandler(void)
 {
-    temp = (temp+1)%20;
-    if(temp == 0) Led_Flash_B();
+    Tetris_TimHandler();
     LedExtension_TimHandler();
 }

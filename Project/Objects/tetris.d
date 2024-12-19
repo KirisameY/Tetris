@@ -31,5 +31,6 @@
 .\objects\tetris.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_usart.h
 .\objects\tetris.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_wwdg.h
 .\objects\tetris.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
+.\objects\tetris.o: ..\User\led/led_extension.h
 .\objects\tetris.o: ..\User\input/input.h
 .\objects\tetris.o: ..\User\main.h

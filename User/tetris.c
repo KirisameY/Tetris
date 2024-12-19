@@ -1,6 +1,7 @@
 #include "tetris.h"
 #include "oled/oled.h"
 #include "led/bsp_gpio_led.h"
+#include "led/led_extension.h"
 #include "input/input.h"
 #include "main.h"
 
@@ -20,14 +21,17 @@ typedef enum{
 extern uint8_t GuiBorder[];
 extern Input_Type Input_Current;
 
-extern uint64_t scr_Cache[128]; // 图像缓存
-extern uint8_t scr_Dirty[16];   // 脏标记(每个位代表一个列)
+extern uint64_t scr_Cache[128];  // 图像缓存
+extern uint8_t scr_Dirty[16];    // 脏标记(每个位代表一个列)
 static uint16_t _gameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
 static uint32_t _score;          // 游戏得分
 static BlockType _currentBlock;  // 当前正在下落的块
 static BlockType _savedBlock;    // 被暂存的块
 static BlockType _nextBlock;     // 下一个会出的块
 static uint8_t _scrDirty;        // 显示更新用脏标记，从最低位开始依次表示：score, saved, next
+
+static uint8_t _time;            // 游戏次级计时器
+static uint8_t _game_spd = 20;    // 每帧时间
 
 #pragma region 图形们
 
@@ -104,13 +108,13 @@ void Tetris_MainGameLoop(void)
     _InitializeGameState();
 
     // 测试用：
-    _gameGrid[19] = 1<<2 | 0x8000;
-    _gameGrid[18] = 1<<7 | 0x8000;
-    _gameGrid[5] = 1<<2 | 0x8000;
-    _score = 0;//1024357689;
-    _savedBlock = BlockType_I;
-    _nextBlock = BlockType_S;
-    _scrDirty = 0x07;
+    //_gameGrid[19] = 1<<2 | 0x8000;
+    //_gameGrid[18] = 1<<7 | 0x8000;
+    //_gameGrid[5] = 1<<2 | 0x8000;
+    //_score = 1024357689;
+    //_savedBlock = BlockType_I;
+    //_nextBlock = BlockType_S;
+    //_scrDirty = 0x07;
 
     // 游戏主循环
     int gameloop = 1;
@@ -121,11 +125,22 @@ void Tetris_MainGameLoop(void)
         //       时间判定和输入处理后应当立刻执行一次显示更新
         //       输入和时间可以闪一下绿/蓝灯
 
-        while(Input_Current == Input_Type_None) {}; //todo: 加入计时后就不要阻塞轮询了
-        _Input();
+        while(_time)
+        {
+            if(Input_Current) {
+                _Input(); // 等待并阻塞主循环，但保持处理操作
+                _Draw();  // 过个绘制帧，更新显示
+            }
+        }
 
         _Draw(); // 在最后执行一个绘制帧
+        Led_Flash_B();
     }
+}
+
+void Tetris_TimHandler(void)
+{
+    _time = (_time+1) % _game_spd;
 }
 
 static void _InitializeGameState(void)
@@ -150,6 +165,7 @@ static void _InitializeGameState(void)
     _score = 0;
     _currentBlock = _nextBlock = _savedBlock = BlockType_None;
     _scrDirty = 0;
+    _time = 1; // 初始化时给一个缓冲帧
 
     //temp
     _xpos = _ypos = 0;
@@ -164,6 +180,7 @@ static void _Input(void)
     _gameGrid[_ypos] |= 0x8000;
     _gameGrid[_ypos] &= ~(1 << _xpos);
 
+    uint8_t input_valid = 1;
     switch (Input_Current)
     {
         case Input_Type_Up:    
@@ -183,10 +200,13 @@ static void _Input(void)
             _nextBlock = (_nextBlock+1)%8;
             break;
         
-        default: break;
+        default: input_valid=0; break;
     }
 
     Input_Clear();
+
+    if (input_valid) Led_Flash_G();
+
     _score++;
     _scrDirty |= 0x07;
     _gameGrid[_ypos] |= 0x8000;
