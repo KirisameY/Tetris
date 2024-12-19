@@ -19,7 +19,6 @@ typedef enum{
 } BlockType;
 
 extern uint8_t GuiBorder[];
-extern Input_Type Input_Current;
 
 extern uint64_t scr_Cache[128];  // 图像缓存
 extern uint8_t scr_Dirty[16];    // 脏标记(每个位代表一个列)
@@ -95,7 +94,7 @@ static const uint8_t G_NumsShiftH = 20;
 #pragma endregion
 
 static void _InitializeGameState(void);
-static void _Input(void);
+static void _Input(Input_Type input);
 static void _Draw(void);
 
 //temp
@@ -125,10 +124,11 @@ void Tetris_MainGameLoop(void)
         //       时间判定和输入处理后应当立刻执行一次显示更新
         //       输入和时间可以闪一下绿/蓝灯
 
-        while(_time)
+        while(_time) // 帧时间
         {
-            if(Input_Current) {
-                _Input(); // 等待并阻塞主循环，但保持处理操作
+            Input_Type input = Input_Pop();
+            if(input) {
+                _Input(input); // 等待并阻塞主循环，但保持处理操作
                 _Draw();  // 过个绘制帧，更新显示
             }
         }
@@ -173,7 +173,7 @@ static void _InitializeGameState(void)
     OLED_ForceUpdateScreen(); // 会同时重置scr_dirty
 }
 
-static void _Input(void)
+static void _Input(Input_Type input)
 {
     //temp 测试输入用
 
@@ -181,7 +181,7 @@ static void _Input(void)
     _gameGrid[_ypos] &= ~(1 << _xpos);
 
     uint8_t input_valid = 1;
-    switch (Input_Current)
+    switch (input)
     {
         case Input_Type_Up:    
             _ypos = MIN(_ypos+1, 19); 
@@ -202,8 +202,6 @@ static void _Input(void)
         
         default: input_valid=0; break;
     }
-
-    Input_Clear();
 
     if (input_valid) Led_Flash_G();
 

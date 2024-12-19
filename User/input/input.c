@@ -7,9 +7,9 @@
 #include "stm32f10x_rcc.h"
 #include "misc.h"
 
-Input_Type Input_Current = 0;
-
 static void Button_Init(void);
+
+static uint8_t _btn = 0;
 
 /// @brief 初始化输入模块
 void Input_Init(void)
@@ -18,17 +18,18 @@ void Input_Init(void)
     Button_Init();
 }
 
-/// @brief 设置输入状态
-/// @param input 新的输入
-void Input_Set(Input_Type input)
+/// @brief 取出暂存的一个输入，会清除取出的输入
+/// @return 当前需解决的输入
+Input_Type Input_Pop(void)
 {
-    Input_Current = input;
-}
-
-/// @brief 清除当前输入状态，即将本次输入设为已处理
-void Input_Clear(void)
-{
-    Input_Current = Input_Type_None;
+    Input_Type result;
+    result = PAJ7620U2_GetInput();
+    if (!result && _btn)
+    {
+        result = Input_Type_Button;
+        _btn = 0;
+    }
+    return result;
 }
 
 
@@ -61,5 +62,5 @@ static void Button_Init(void)
 
 void Button_HandleInt(void)
 {
-    Input_Set(Input_Type_Button);
+    _btn = 1;
 }

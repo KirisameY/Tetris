@@ -1,6 +1,8 @@
 #ifndef __PAJ7620U2_H
 #define __PAJ7620U2_H
 
+#include "input.h"
+
 // 宏定义
 
 //IIC
@@ -17,5 +19,6 @@
 
 void PAJ7620U2_Init(void);
 void PAJ7620U2_HandleInt(void);
+Input_Type PAJ7620U2_GetInput(void);
 
 #endif

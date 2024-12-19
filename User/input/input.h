@@ -13,7 +13,7 @@ typedef enum{
 } Input_Type;
 
 void Input_Init(void);
-void Input_Set(Input_Type input);
-void Input_Clear(void);
+Input_Type Input_Pop(void);
+void Button_HandleInt(void);
 
 #endif

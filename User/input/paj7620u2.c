@@ -120,22 +120,14 @@ const static uint8_t GestureInitCmd[][2]={
 #define GES_COUNT_CLOCKWISE BIT(7) //逆时针
 #define GES_WAVE            BIT(8) //挥动
 
-// #define GES_UP              (1<<(0)) //向上
-// #define GES_DOWN            (1<<(1)) //向下
-// #define GES_LEFT            (1<<(2)) //向左
-// #define GES_RIGHT           (1<<(3)) //向右
-// #define GES_FORWARD         (1<<(4)) //向前
-// #define GES_BACKWARD        (1<<(5)) //向后
-// #define GES_CLOCKWISE       (1<<(6)) //顺时针
-// #define GES_COUNT_CLOCKWISE (1<<(7)) //逆时针
-// #define GES_WAVE            (1<<(8)) //挥动
-
 #pragma endregion
 
 static void PAJ7620U2_IntInit(void);
 static uint8_t PAJ7620U2_Wakeup(void);
 static void PAJ7620U2_I2CInit(void);
 static void PAJ7620U2_GestureInit(void);
+
+uint8_t PAJ7620U2_HasInput = 0;
 
 /// @brief 初始化手势识别模块
 void PAJ7620U2_Init(void)
@@ -154,6 +146,14 @@ void PAJ7620U2_Init(void)
 
 void PAJ7620U2_HandleInt(void)
 {
+    PAJ7620U2_HasInput = 1;
+}
+
+Input_Type PAJ7620U2_GetInput(void)
+{
+    if(!PAJ7620U2_HasInput) return Input_Type_None;
+    PAJ7620U2_HasInput = 0;
+
     uint8_t ges[2];
 
     IIC_Start();
@@ -171,14 +171,16 @@ void PAJ7620U2_HandleInt(void)
 
     switch ((uint16_t)ges[1]<<8 | ges[0])
     {
-        case GES_UP:              Input_Set(Input_Type_Down);          break; // 反向映射
-        case GES_DOWN:            Input_Set(Input_Type_Up);            break;
-        case GES_LEFT:            Input_Set(Input_Type_Right);         break;
-        case GES_RIGHT:           Input_Set(Input_Type_Left);          break;
-        case GES_CLOCKWISE:       Input_Set(Input_Type_Clockwise);     break;
-        case GES_COUNT_CLOCKWISE: Input_Set(Input_Type_AntiClockwise); break;
-        default:                                                       break;
+        case GES_UP:              return Input_Type_Down;         // 反向映射
+        case GES_DOWN:            return Input_Type_Up;           
+        case GES_LEFT:            return Input_Type_Right;        
+        case GES_RIGHT:           return Input_Type_Left;         
+        case GES_CLOCKWISE:       return Input_Type_Clockwise;    
+        case GES_COUNT_CLOCKWISE: return Input_Type_AntiClockwise;
+        default:                  break;
     }
+    
+    return Input_Type_None;
 }
 
 #pragma region init

@@ -8,6 +8,8 @@
 #include "stm32f10x_rcc.h"
 #include "misc.h"
 
+extern uint8_t PAJ7620U2_HasInput;
+
 /// @brief 初始化Tim2计时器
 void TIM2_Init(void)
 {
