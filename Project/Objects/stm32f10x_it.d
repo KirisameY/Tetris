@@ -31,3 +31,4 @@
 .\objects\stm32f10x_it.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
 .\objects\stm32f10x_it.o: ..\User\systick/bsp_SysTick.h
 .\objects\stm32f10x_it.o: ..\User\led/bsp_gpio_led.h
+.\objects\stm32f10x_it.o: ..\User\input/paj7620u2.h

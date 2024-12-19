@@ -10,8 +10,12 @@
 #define PAJ7620U2_BANK_0       0x00
 #define PAJ7620U2_BANK_1       0x01
 
+#define PAJ7620U2_GET_INT_FLAG1          0X43 //获取手势检测中断标志寄存器1(获取手势结果)
+#define PAJ7620U2_GET_INT_FLAG2          0X44 //获取手势检测中断标志寄存器2(获取手势结果)
+
 // 方法定义
 
 void PAJ7620U2_Init(void);
+void PAJ7620U2_ClearInt(void);
 
 #endif

@@ -25,6 +25,7 @@
 #include "stm32f10x.h"
 #include "systick/bsp_SysTick.h"
 #include "led/bsp_gpio_led.h"
+#include "input/paj7620u2.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
@@ -161,16 +162,18 @@ void EXTI0_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    RGB_ALL_ON
-    if (EXTI_GetITStatus(EXTI_Line8) != RESET)
+    //RGB_ALL_ON
+    if (EXTI_GetITStatus(EXTI_Line7) != RESET)
     {
-        EXTI_ClearITPendingBit(EXTI_Line8); // 清除中断标志
-        // 处理中断事件
+        for (uint32_t i = 0x100; i > 0; i--);  // 延时消抖
+        EXTI_ClearITPendingBit(EXTI_Line7); // 清除中断标志
+
         RGB_ALL_ON
+        PAJ7620U2_ClearInt();
     }
-    for (uint32_t i = 0x444444; i > 0; i--);    
+    for (uint32_t i = 0x444444; i > 0; i--);
     RGB_ALL_OFF
-    for (uint32_t i = 0x444444; i > 0; i--);  
+    for (uint32_t i = 0x444444; i > 0; i--);
 }
 
 
