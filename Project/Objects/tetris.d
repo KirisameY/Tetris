@@ -1,7 +1,7 @@
 .\objects\tetris.o: ..\User\tetris.c
 .\objects\tetris.o: ..\User\tetris.h
-.\objects\tetris.o: ..\User\oled/oled.h
 .\objects\tetris.o: D:\Arm\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\tetris.o: ..\User\oled/oled.h
 .\objects\tetris.o: ..\User\led/bsp_gpio_led.h
 .\objects\tetris.o: ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h
 .\objects\tetris.o: ..\Libraries\CMSIS\CM3\CoreSupport\core_cm3.h
@@ -35,3 +35,4 @@
 .\objects\tetris.o: ..\User\input/input.h
 .\objects\tetris.o: ..\User\random/random.h
 .\objects\tetris.o: ..\User\main.h
+.\objects\tetris.o: D:\Arm\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

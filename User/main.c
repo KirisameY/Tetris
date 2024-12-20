@@ -35,7 +35,7 @@ int main(void)
         Delay_1ms(100);
         RGB_ALL_OFF
 
-        Tetris_MainGameLoop();
+        Tetris_MainGameLoop(10);
     }
 }
 

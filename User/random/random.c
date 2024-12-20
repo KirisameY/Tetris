@@ -26,11 +26,13 @@ int Random_Next(int from, int to)
 /// @param count    生成的数量
 /// @param buffer   结果填充的位置，长度需要至少为count
 /// @param rdbuffer 用于存储中间随机值的缓存，长度需要至少为count
-void Random_Shuffle(uint8_t from, uint8_t count, uint8_t* buffer, uint8_t* rdbuffer)
+void Random_Shuffle(uint8_t from, uint8_t count, uint8_t* buffer)
 {
+    uint8_t rdbuf[count];
+
     for (uint8_t i = 0; i < count; i++) //清空rdbuffer
     {
-        rdbuffer[i] = 0;
+        rdbuf[i] = 0;
     }
 
     for (uint8_t i = 0; i < count; i++) //向buffer中填充随机数据
@@ -41,18 +43,18 @@ void Random_Shuffle(uint8_t from, uint8_t count, uint8_t* buffer, uint8_t* rdbuf
         {
             if (j==i)
             {
-                rdbuffer[j] = rd;
+                rdbuf[j] = rd;
                 buffer [j] = from+i;
                 break;
             }
-            if (rdbuffer[j] <= rd) continue;
+            if (rdbuf[j] <= rd) continue;
             
             for (int8_t k = i-1; k >=j; k--)
             {
-                rdbuffer[k+1] = rdbuffer[k];
+                rdbuf[k+1] = rdbuf[k];
                 buffer[k+1] = buffer[k];
             }
-            rdbuffer[j] = rd;
+            rdbuf[j] = rd;
             buffer [j] = from+i;
             break;
         }

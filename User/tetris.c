@@ -7,6 +7,7 @@
 #include "main.h"
 
 #include <stdint.h>
+#include <math.h>
 
 typedef enum{
     BlockType_None,
@@ -21,24 +22,25 @@ typedef enum{
 
 extern uint8_t GuiBorder[];
 
-extern uint64_t scr_Cache[128];  // 图像缓存
-extern uint8_t scr_Dirty[16];    // 图像缓存脏标记(每个位代表一个列)
+extern uint64_t scr_Cache[128];       // 图像缓存
+extern uint8_t scr_Dirty[16];         // 图像缓存脏标记(每个位代表一个列)
 
-static uint32_t _score;          // 游戏得分
-static uint16_t _gameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
-static BlockType _currentBlock;  // 当前正在下落的块
-static uint8_t _currentBlockDir; // 当前正在下落的块的朝向(0-3)
-static int8_t _currentPosX;      // 当前正在下落的块的x轴位置(相对最左下角)
-static int8_t _currentPosY;      // 当前正在下落的块的y轴位置(相对最左下角)
-static BlockType _savedBlock;    // 被暂存的块
-static BlockType _nextBlock;     // 下一个会出的块
-static uint8_t _scrDirty;        // 显示更新用脏标记，从最低位开始依次表示：score, saved, next
-static uint8_t _time;            // 游戏次级计时器
-static uint8_t _gameSpd = 20;    // 每帧时间，数值回头会改
-static uint8_t _gameLoop;        // 主循环持续标志，为0时游戏结束
-static uint8_t _fastDrop;        // 用于标志快速降落（下输入）
-static BlockType _blockBag[7];   // 该轮的随机出块包
-static uint8_t _blockBagPos;     // 当前出块在随机出块包的位置
+static uint32_t _score;               // 游戏得分
+static uint16_t _gameGrid[24];        // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。[20]开始是溢出位，不显示
+static BlockType _currentBlock;       // 当前正在下落的块
+static uint8_t _currentBlockRotation; // 当前正在下落的块的朝向(0-3)
+static int8_t _currentPosX;           // 当前正在下落的块的x轴位置(相对最左下角)
+static int8_t _currentPosY;           // 当前正在下落的块的y轴位置(相对最左下角)
+static BlockType _savedBlock;         // 被暂存的块
+static BlockType _nextBlock;          // 下一个会出的块
+static uint8_t _gDirty;               // 显示更新用脏标记，从最低位开始依次表示：score, saved, next, saveUnable
+static int8_t _time;                  // 游戏次级计时器
+static uint8_t _gameSpd = 10;         // 每帧时间，数值回头会改
+static uint8_t _gameLoop;             // 主循环持续标志，为0时游戏结束
+static uint8_t _fastDrop;             // 用于标志快速降落（下输入）
+static uint8_t _saveSwitched;         // 用于标志当前是否进行过saved切换
+static BlockType _blockBag[7];        // 该轮的随机出块包
+static uint8_t _blockBagPos;          // 当前出块在随机出块包的位置
 
 #pragma region 图形们
 
@@ -99,6 +101,9 @@ static const uint8_t G_Nums[10][3] = {
 static const uint8_t G_NumsMask = 0x7C;
 static const uint8_t G_NumsShiftH = 20;
 
+static const uint32_t G_SavUnable = 0x00016842;
+static const uint8_t G_SavUnableShiftV = 5;
+
 #pragma endregion
 
 #pragma region 游戏常量
@@ -121,23 +126,13 @@ static void _Input(Input_Type input);
 static void _Time(void);
 static void _Draw(void);
 
-//temp
-static uint8_t _xpos, _ypos;
-
-/// @brief 执行游戏的主循环
-/// @param
-void Tetris_MainGameLoop(void)
+/// @brief 执行游戏的主循环，游戏结束时返回
+/// @param timescale 游戏时间倍率，单位为计时器间隔
+/// @return 最终得分
+uint32_t Tetris_MainGameLoop(uint8_t timescale)
 {
+    _gameSpd = timescale;
     _InitializeGameState();
-
-    // 测试用：
-    //_gameGrid[19] = 1<<2 | 0x8000;
-    //_gameGrid[18] = 1<<7 | 0x8000;
-    //_gameGrid[5] = 1<<2 | 0x8000;
-    //_score = 1024357689;
-    //_savedBlock = BlockType_I;
-    //_nextBlock = BlockType_S;
-    //_scrDirty = 0x07;
 
     // 游戏主循环
     while (_gameLoop)
@@ -147,7 +142,7 @@ void Tetris_MainGameLoop(void)
         //       时间判定和输入处理后应当立刻执行一次显示更新
         //       输入和时间可以闪一下绿/蓝灯
 
-        while(_time) // 帧时间
+        while(_time > 0) // 帧时间
         {
             Input_Type input = Input_Pop();
             if(input) {
@@ -159,7 +154,7 @@ void Tetris_MainGameLoop(void)
         _Time(); // 时间更新
         _Draw(); // 在最后执行一个绘制帧
         Led_Flash_B();
-        while (_time == 0) ; // 防止重复执行
+        while (_time <= 0) ; // 防止重复执行
     }
 }
 
@@ -181,7 +176,7 @@ static void _InitializeGameState(void)
     }
 
     // 初始化游戏网格
-    for (uint8_t i = 0; i < 20; i++)
+    for (uint8_t i = 0; i < 24; i++)
     {
         _gameGrid[i] = 0;
     }
@@ -189,8 +184,9 @@ static void _InitializeGameState(void)
     // 初始化游戏数据
     _score = 0;
     _currentBlock = _nextBlock = _savedBlock = BlockType_None;
-    _scrDirty = 0;
+    _gDirty = 0;
     _fastDrop = 0;
+    _saveSwitched = 0;
     _blockBagPos = 0;
     _gameLoop = 1;
     _time = 1; // 初始化时给一帧缓冲时间
@@ -198,53 +194,49 @@ static void _InitializeGameState(void)
     // 重置随机数种子
     Random_ResetSeed();
 
-    //temp
-    _xpos = _ypos = 0;
-
-    OLED_ForceUpdateScreen(); // 会同时重置scr_dirty
+    OLED_ForceUpdateScreen(); // 初始化显示，会同时重置scr_dirty
 }
 
 #pragma region 游戏逻辑
 
 static void _UpdateNext(void);
+static void _SaveSwitch(void);
+static void _AfterDrop(void);
+static int8_t _TryMoveCurrent(int8_t x, int8_t y);
+static int8_t _TryRotateCurrent(int8_t dir);
+static void _FastDrop(void);
 static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer);
+static int8_t _DetectCollision(int8_t* blocks, int8_t xshift, int8_t yshift);
 
 static void _Input(Input_Type input)
 {
-    //temp 测试输入用
-
-    _gameGrid[_ypos] |= 0x8000;
-    _gameGrid[_ypos] &= ~(1 << _xpos);
-
     uint8_t input_valid = 1;
     switch (input)
     {
         case Input_Type_Up:    
-            _ypos = MIN(_ypos+1, 19); 
-            _savedBlock = (_savedBlock+1)%8;
+            _SaveSwitch();
             break;
         case Input_Type_Down:  
-            _ypos = MAX(_ypos-1, 0);   
-            _savedBlock = (_savedBlock+7)%8;
+            _fastDrop = 1;
+            _time = -1;
             break;
         case Input_Type_Left:  
-            _xpos = MAX(_xpos-1, 0);  
-            _nextBlock = (_nextBlock+7)%8;
+            _TryMoveCurrent(-1,0);
             break;
         case Input_Type_Right: 
-            _xpos = MIN(_xpos+1, 9);   
-            _nextBlock = (_nextBlock+1)%8;
+            _TryMoveCurrent(1,0);
             break;
-        
+        case Input_Type_Clockwise:
+            _TryRotateCurrent(1);
+            break;
+        case Input_Type_AntiClockwise:
+            _TryRotateCurrent(-1);
+            break;
+
         default: input_valid=0; break;
     }
 
     if (input_valid) Led_Flash_G();
-
-    _score++;
-    _scrDirty |= 0x07;
-    _gameGrid[_ypos] |= 0x8000;
-    _gameGrid[_ypos] |= 1 << _xpos;
 }
 
 static void _Time(void)
@@ -253,32 +245,24 @@ static void _Time(void)
     {
         _currentPosX = 3;
         _currentPosY = 20;
+        _currentBlockRotation = 0;
         _UpdateNext();
     }
 
-    //todo 这个是临时测试，要加碰撞判定
-
-    int8_t blocks[4][2];
-    _GetBlockRealPos(_currentBlock, _currentBlockDir, _currentPosX, _currentPosY, blocks[0]);
-    for (uint8_t i = 0; i < 4; i++)
+    if (_fastDrop)
     {
-        if(blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 20) continue;
-        _gameGrid[blocks[i][1]] &= ~(1<<(blocks[i][0]));
-        _gameGrid[blocks[i][1]] |= 0x8000;
-    }
-    
-    if(_currentPosY < 0){
+        _FastDrop();
+        _fastDrop = 0;
         _currentBlock = BlockType_None;
+        _AfterDrop();
         return;
     }
-
-    _currentPosY--;
-    _GetBlockRealPos(_currentBlock, _currentBlockDir, _currentPosX, _currentPosY, blocks[0]);
-    for (uint8_t i = 0; i < 4; i++)
+    
+    if(!_TryMoveCurrent(0, -1))
     {
-        if(blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 20) continue;
-        _gameGrid[blocks[i][1]] |= 1<<(blocks[i][0]);
-        _gameGrid[blocks[i][1]] |= 0x8000;
+        _currentBlock = BlockType_None;
+        _AfterDrop();
+        return;
     }
 }
 
@@ -286,16 +270,185 @@ static void _UpdateNext(void)
 {
     if(_blockBagPos == 0)
     {
-        uint8_t rdbuf[7];
-        Random_Shuffle(1, 7, _blockBag, rdbuf);
+        Random_Shuffle(1, 7, _blockBag);
     }
     _currentBlock = _nextBlock;
     _nextBlock = _blockBag[_blockBagPos];
     _blockBagPos = (_blockBagPos+1) % 7;
 
-    _scrDirty |= 0x04;
+    _gDirty |= 0x04;
 
     if(_currentBlock == BlockType_None) _UpdateNext(); // 第一次执行时会递归一次以填充next和current
+}
+
+void _SaveSwitch(void)
+{
+    if (_saveSwitched) return;
+    if (_currentBlock == BlockType_None) return;
+    _saveSwitched = 1;
+
+    int8_t blocks[4][2];
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][1] >= 24) continue;
+        _gameGrid[blocks[i][1]] &= ~(1 << (blocks[i][0]));
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+
+    _gDirty |= 0x0A;
+
+    _currentPosX = 3;
+    _currentPosY = 20;
+    _currentBlockRotation = 0;
+    BlockType tmp = _savedBlock;
+    _savedBlock = _currentBlock;
+    _currentBlock = tmp;
+}
+
+void _AfterDrop(void)
+{
+    // 重置sav状态
+    if(_saveSwitched)
+    {
+        _saveSwitched = 0;
+        _gDirty |= ~0x01;
+    }
+
+    // 判定消行
+    uint8_t h = 0;
+    while (_gameGrid[h] != 0 && h < 24)
+    {
+        h++;
+    }
+
+    uint8_t cleared = 0;
+    uint8_t i = 0;
+    while (i < h)
+    {
+        if((_gameGrid[i] & 0x03FF) != 0x03FF)
+        {
+            i++;
+            continue;
+        }
+
+        cleared++;
+        for (uint8_t j = i; j < h; j++)
+        {
+            if(j == h-1) _gameGrid[j] = 0;
+            else _gameGrid[j] = _gameGrid[j+1];
+            _gameGrid[j] |= 0x8000;
+        }
+    }
+    
+    if (cleared != 0)
+    {
+        _gDirty |= 0x01;
+        _score += pow(2, cleared) * _gameSpd; // *10/10约掉
+    }
+
+    // 判定gameover
+    if(_gameGrid[20] & 0x03FF) _gameLoop = 0;
+}
+
+static int8_t _TryMoveCurrent(int8_t x, int8_t y)
+{
+    if(_currentBlock == BlockType_None) return 1;
+
+    int8_t blocks[4][2];
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][1] >= 24) continue;
+        _gameGrid[blocks[i][1]] &= ~(1 << (blocks[i][0]));
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+
+    int8_t succeed = _DetectCollision(blocks[0], x, y);
+
+    if (succeed)
+    {
+        _currentPosX += x;
+        _currentPosY += y;
+    }
+
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 24)
+            continue;
+        _gameGrid[blocks[i][1]] |= 1 << (blocks[i][0]);
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+
+    return succeed;
+}
+
+int8_t _TryRotateCurrent(int8_t dir)
+{
+    if(_currentBlock == BlockType_None) return 1;
+
+    int8_t blocks[4][2];
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][1] >= 24) continue;
+        _gameGrid[blocks[i][1]] &= ~(1 << (blocks[i][0]));
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+    
+    _GetBlockRealPos(_currentBlock, (_currentBlockRotation+4+dir)%4, _currentPosX, _currentPosY, blocks[0]);
+    int8_t succeed = _DetectCollision(blocks[0], 0, 0);
+
+    if (succeed)
+    {
+        _currentBlockRotation = (_currentBlockRotation+4+dir) % 4;
+    }
+
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 24)
+            continue;
+        _gameGrid[blocks[i][1]] |= 1 << (blocks[i][0]);
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+
+    return succeed;
+}
+
+void _FastDrop(void)
+{
+    if(_currentBlock == BlockType_None) return;
+
+    int8_t blocks[4][2];
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][1] >= 24) continue;
+        _gameGrid[blocks[i][1]] &= ~(1 << (blocks[i][0]));
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+
+    uint8_t dropping = 1;
+    int8_t yshift=0;
+    while (dropping)
+    {
+        yshift--;
+        dropping = _DetectCollision(blocks[0], 0, yshift);
+    }
+    yshift++;
+    
+    _currentPosY += yshift;
+
+    _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 24)
+            continue;
+        _gameGrid[blocks[i][1]] |= 1 << (blocks[i][0]);
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
 }
 
 static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer)
@@ -312,6 +465,22 @@ static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y
     }
 }
 
+static int8_t _DetectCollision(int8_t *blocks, int8_t xshift, int8_t yshift)
+{
+    for (uint8_t i = 0; i < 8; i += 2)
+    {
+        int8_t newx = blocks[i]+xshift, newy = blocks[i+1]+yshift;
+        if (newy >= 20) continue;
+        if (newx < 0 || newx >= 10 || newy < 0 ||
+            (_gameGrid[newy] & (1<<(newx))) != 0) 
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 #pragma endregion
 
 #pragma region 图像更新&绘制
@@ -320,7 +489,7 @@ static void _CalculateGridLine(uint8_t h, uint16_t grid);
 static void _Draw(void)
 {
     // 更新得分显示
-    if (_scrDirty & 0x01)
+    if (_gDirty & 0x01)
     {
         uint32_t score = _score;
         for (uint8_t i = 0; score != 0 ; i++) // 考虑到一局内分数只会递增而开始时会重置UI，不需要考虑更新更高位
@@ -339,7 +508,7 @@ static void _Draw(void)
     }
 
     // 更新方块预览画面
-    if (_scrDirty & 0x02) // SavedBlock
+    if (_gDirty & 0x02) // SavedBlock
     {
         for (uint8_t i = 0; i < 4; i++)
         {
@@ -349,7 +518,7 @@ static void _Draw(void)
             scr_Cache[scr_h] |= (uint64_t)G_BlockPreviews[_savedBlock][i] << G_SavePreviewShiftH;
         }
     }
-    if (_scrDirty & 0x04) // NextBlock
+    if (_gDirty & 0x04) // NextBlock
     {
         for (uint8_t i = 0; i < 4; i++)
         {
@@ -357,6 +526,20 @@ static void _Draw(void)
             scr_Dirty[scr_h/8] |= 0x80>>(scr_h%8);
             scr_Cache[scr_h] &= ~((uint64_t)0xFF << G_NextPreviewShiftH);
             scr_Cache[scr_h] |= (uint64_t)G_BlockPreviews[_nextBlock][i] << G_NextPreviewShiftH;
+        }
+    }
+
+    // 更新sav字符状态
+    if (_gDirty & 0x08)
+    {
+        scr_Dirty[G_SavUnableShiftV/8] |= 0x80>>(G_SavUnableShiftV%8);
+        if (_saveSwitched) 
+        {
+            scr_Cache[G_SavUnableShiftV] &= ~(uint64_t)G_SavUnable;
+        }
+        else
+        {
+            scr_Cache[G_SavUnableShiftV] |= G_SavUnable;
         }
     }
 
@@ -369,6 +552,9 @@ static void _Draw(void)
 
         _gameGrid[i] &= 0x7fff; // 清除脏标记
     }
+
+    // 清除脏标记
+    _gDirty = 0;
 
     // 刷新屏幕
     OLED_UpdateScreen();
