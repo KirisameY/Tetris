@@ -3,6 +3,7 @@
 #include "led/bsp_gpio_led.h"
 #include "led/led_extension.h"
 #include "input/input.h"
+#include "random/random.h"
 #include "main.h"
 
 #include <stdint.h>
@@ -21,16 +22,23 @@ typedef enum{
 extern uint8_t GuiBorder[];
 
 extern uint64_t scr_Cache[128];  // 图像缓存
-extern uint8_t scr_Dirty[16];    // 脏标记(每个位代表一个列)
-static uint16_t _gameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
+extern uint8_t scr_Dirty[16];    // 图像缓存脏标记(每个位代表一个列)
+
 static uint32_t _score;          // 游戏得分
+static uint16_t _gameGrid[20];   // 游戏网格，低10位为数据，高位在左；最高位为该行脏标记；其他位暂无意义，宜保留0值。
 static BlockType _currentBlock;  // 当前正在下落的块
+static uint8_t _currentBlockDir; // 当前正在下落的块的朝向(0-3)
+static int8_t _currentPosX;      // 当前正在下落的块的x轴位置(相对最左下角)
+static int8_t _currentPosY;      // 当前正在下落的块的y轴位置(相对最左下角)
 static BlockType _savedBlock;    // 被暂存的块
 static BlockType _nextBlock;     // 下一个会出的块
 static uint8_t _scrDirty;        // 显示更新用脏标记，从最低位开始依次表示：score, saved, next
-
 static uint8_t _time;            // 游戏次级计时器
-static uint8_t _game_spd = 20;    // 每帧时间
+static uint8_t _gameSpd = 20;    // 每帧时间，数值回头会改
+static uint8_t _gameLoop;        // 主循环持续标志，为0时游戏结束
+static uint8_t _fastDrop;        // 用于标志快速降落（下输入）
+static BlockType _blockBag[7];   // 该轮的随机出块包
+static uint8_t _blockBagPos;     // 当前出块在随机出块包的位置
 
 #pragma region 图形们
 
@@ -93,8 +101,24 @@ static const uint8_t G_NumsShiftH = 20;
 
 #pragma endregion
 
+#pragma region 游戏常量
+
+static const uint16_t Blocks[8][4]= { // 格式：Blocks[类型][朝向] 里面每4位代表一个块的坐标，高2位Y低两位X
+    {0x0000,0x0000,0x0000,0x0000}, // None, this should not be used
+    {0x159D,0x4567,0x159D,0x4567}, // I
+    {0x1569,0x1456,0x1459,0x4569}, // T
+    {0x1256,0x1256,0x1256,0x1256}, // O
+    {0x156A,0x1245,0x156A,0x1245}, // Z
+    {0x2569,0x0156,0x2569,0x0156}, // S
+    {0x126A,0x4568,0x159A,0x2456}, // J
+    {0x1259,0x0456,0x269A,0x456A}, // L
+};
+
+#pragma endregion
+
 static void _InitializeGameState(void);
 static void _Input(Input_Type input);
+static void _Time(void);
 static void _Draw(void);
 
 //temp
@@ -116,8 +140,7 @@ void Tetris_MainGameLoop(void)
     //_scrDirty = 0x07;
 
     // 游戏主循环
-    int gameloop = 1;
-    while (gameloop)
+    while (_gameLoop)
     {
         // todo: 要等待一定时间间隔，进行一次时间流逝判定（计时器整上）；
         //       有输入时应当立即处理输入并视情况重置计时（如输入了指令“下”方块下落至底部时）；
@@ -128,19 +151,21 @@ void Tetris_MainGameLoop(void)
         {
             Input_Type input = Input_Pop();
             if(input) {
-                _Input(input); // 等待并阻塞主循环，但保持处理操作
-                _Draw();  // 过个绘制帧，更新显示
+                _Input(input); // 等待并阻塞主循环，但轮询保持输入监听
+                _Draw();       // 过个绘制帧，更新显示
             }
         }
 
+        _Time(); // 时间更新
         _Draw(); // 在最后执行一个绘制帧
         Led_Flash_B();
+        while (_time == 0) ; // 防止重复执行
     }
 }
 
 void Tetris_TimHandler(void)
 {
-    _time = (_time+1) % _game_spd;
+    _time = (_time+1) % _gameSpd;
 }
 
 static void _InitializeGameState(void)
@@ -165,13 +190,24 @@ static void _InitializeGameState(void)
     _score = 0;
     _currentBlock = _nextBlock = _savedBlock = BlockType_None;
     _scrDirty = 0;
-    _time = 1; // 初始化时给一个缓冲帧
+    _fastDrop = 0;
+    _blockBagPos = 0;
+    _gameLoop = 1;
+    _time = 1; // 初始化时给一帧缓冲时间
+
+    // 重置随机数种子
+    Random_ResetSeed();
 
     //temp
     _xpos = _ypos = 0;
 
     OLED_ForceUpdateScreen(); // 会同时重置scr_dirty
 }
+
+#pragma region 游戏逻辑
+
+static void _UpdateNext(void);
+static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer);
 
 static void _Input(Input_Type input)
 {
@@ -211,6 +247,73 @@ static void _Input(Input_Type input)
     _gameGrid[_ypos] |= 1 << _xpos;
 }
 
+static void _Time(void)
+{
+    if(_currentBlock == BlockType_None)
+    {
+        _currentPosX = 3;
+        _currentPosY = 20;
+        _UpdateNext();
+    }
+
+    //todo 这个是临时测试，要加碰撞判定
+
+    int8_t blocks[4][2];
+    _GetBlockRealPos(_currentBlock, _currentBlockDir, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if(blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 20) continue;
+        _gameGrid[blocks[i][1]] &= ~(1<<(blocks[i][0]));
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+    
+    if(_currentPosY < 0){
+        _currentBlock = BlockType_None;
+        return;
+    }
+
+    _currentPosY--;
+    _GetBlockRealPos(_currentBlock, _currentBlockDir, _currentPosX, _currentPosY, blocks[0]);
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if(blocks[i][0] < 0 || blocks[i][0] >= 10 || blocks[i][1] < 0 || blocks[i][1] >= 20) continue;
+        _gameGrid[blocks[i][1]] |= 1<<(blocks[i][0]);
+        _gameGrid[blocks[i][1]] |= 0x8000;
+    }
+}
+
+static void _UpdateNext(void)
+{
+    if(_blockBagPos == 0)
+    {
+        uint8_t rdbuf[7];
+        Random_Shuffle(1, 7, _blockBag, rdbuf);
+    }
+    _currentBlock = _nextBlock;
+    _nextBlock = _blockBag[_blockBagPos];
+    _blockBagPos = (_blockBagPos+1) % 7;
+
+    _scrDirty |= 0x04;
+
+    if(_currentBlock == BlockType_None) _UpdateNext(); // 第一次执行时会递归一次以填充next和current
+}
+
+static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer)
+{
+    if(block == BlockType_None) exception("Tried to get blocks of BlockType_None");
+
+    uint16_t blocks = Blocks[block][rotate];
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        buffer[2*i] = x + (blocks & 0x03);
+        blocks>>=2;
+        buffer[2*i+1] = y + (blocks & 0x03);
+        blocks>>=2;
+    }
+}
+
+#pragma endregion
+
 #pragma region 图像更新&绘制
 
 static void _CalculateGridLine(uint8_t h, uint16_t grid);
@@ -220,7 +323,7 @@ static void _Draw(void)
     if (_scrDirty & 0x01)
     {
         uint32_t score = _score;
-        for (uint8_t i = 0; score != 0 ; i++) // 考虑到一局内分数只会递增而开始时会重置UI，不需要考虑更新更高位的显式
+        for (uint8_t i = 0; score != 0 ; i++) // 考虑到一局内分数只会递增而开始时会重置UI，不需要考虑更新更高位
         {
             uint8_t n = score%10;
             for (uint8_t j = 1; j <= 3; j++)

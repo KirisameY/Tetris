@@ -578,6 +578,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\led\led_extension.c</FilePath>
             </File>
+            <File>
+              <FileName>random.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\random\random.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

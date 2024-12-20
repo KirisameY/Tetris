@@ -10,6 +10,7 @@
 #include "iic/bsp_iic_debug.h"
 #include "oled/oled.h"
 #include "input/input.h"
+#include "random/random.h"
 
 #include "tetris.h"
 #include "main.h"
@@ -24,7 +25,8 @@ int main(void)
     Systick_Init();      // 初始化Systick
     IIC_GPIO_Config();   // 初始化IIC引脚
     OLED_Initialize();   // 初始化OLED屏幕
-    Input_Init();
+    Input_Init();        // 初始化输入模块
+    Random_Init();       // 初始化随机模块
 
     for (;;)
     {

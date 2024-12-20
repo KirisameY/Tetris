@@ -33,4 +33,5 @@
 .\objects\tetris.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
 .\objects\tetris.o: ..\User\led/led_extension.h
 .\objects\tetris.o: ..\User\input/input.h
+.\objects\tetris.o: ..\User\random/random.h
 .\objects\tetris.o: ..\User\main.h
