@@ -16,6 +16,7 @@
 //方法定义
 
 void OLED_Initialize(void);
+void OLED_Clear(void);
 void OLED_DrawPic(uint8_t* pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8_t height);
 void OLED_UpdateScreen(void);
 void OLED_ForceUpdateScreen(void);

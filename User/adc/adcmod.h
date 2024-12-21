@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 void ADCMod_Init(void);
-double ADCMod_GetKnob(void);
+uint16_t ADCMod_GetKnob(void);
 uint32_t ADCMod_GetRandom(void);
 
 #endif

@@ -395,10 +395,26 @@ int8_t _TryRotateCurrent(int8_t dir)
     _GetBlockRealPos(_currentBlock, (_currentBlockRotation+4+dir)%4, _currentPosX, _currentPosY, blocks[0]);
     int8_t succeed = 0;
     succeed = _DetectCollision(blocks[0], 0, 0);
-    if(!succeed) succeed = _DetectCollision(blocks[0], 1, 0);  else _currentPosX+=1;
-    if(!succeed) succeed = _DetectCollision(blocks[0], -1, 0); else _currentPosX-=1;
-    if(!succeed) succeed = _DetectCollision(blocks[0], 0, 1);  else _currentPosY+=1;
-    if(!succeed) succeed = _DetectCollision(blocks[0], 0, -1); else _currentPosY-=1;
+    if (!succeed) 
+    {
+        succeed = _DetectCollision(blocks[0], 1, 0);
+        if (succeed) _currentPosX+=1;
+    }
+    if (!succeed) 
+    {
+        succeed = _DetectCollision(blocks[0], -1, 0);
+        if (succeed) _currentPosX-=1;
+    }
+    if (!succeed) 
+    {
+        succeed = _DetectCollision(blocks[0], 0, 1);
+        if (succeed) _currentPosY+=1;
+    }
+    if (!succeed) 
+    {
+        succeed = _DetectCollision(blocks[0], 0, -1);
+        if (succeed) _currentPosY-=1;
+    }
 
     if (succeed)
     {

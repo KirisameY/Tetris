@@ -68,6 +68,30 @@ void OLED_Initialize(void)
     IIC_Stop();
 }
 
+void OLED_Clear(void)
+{
+    IIC_Start();
+    IIC_SEND_N_WAIT(OLED_CALL_WR);
+    IIC_SEND_N_WAIT(OLED_WR_CMD_CO);
+    IIC_SEND_N_WAIT(0x22)
+    IIC_SEND_N_WAIT(0x00)
+    IIC_SEND_N_WAIT(0x07) // 重置页地址
+
+    IIC_SEND_N_WAIT(0x21)
+    IIC_SEND_N_WAIT(0x00)
+    IIC_SEND_N_WAIT(0x7f) // 重置列地址
+
+    IIC_Start();
+    IIC_SEND_N_WAIT(OLED_CALL_WR);
+    IIC_SEND_N_WAIT(OLED_WR_DATA_CO);
+    for (int i = 128 * 8; i > 0; i--)
+    {
+        IIC_SEND_N_WAIT(0x00);
+    }
+
+    IIC_Stop();
+}
+
 /// @brief 绘制图像
 /// @param pic 要绘制的图像序列
 /// @param xpos x起始坐标(按分页算，0-7)

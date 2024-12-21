@@ -138,10 +138,6 @@ void PAJ7620U2_Init(void)
     PAJ7620U2_I2CInit();
     Delay_1ms(5);
     PAJ7620U2_GestureInit();
-    //EXTI_GenerateSWInterrupt(EXTI_Line8);
-    //EXTI_GenerateSWInterrupt(EXTI_Line0);
-    //EXTI->SWIER |= EXTI_Line0;
-    //EXTI->SWIER |= EXTI_Line8;
 }
 
 void PAJ7620U2_HandleInt(void)
@@ -152,6 +148,7 @@ void PAJ7620U2_HandleInt(void)
 Input_Type PAJ7620U2_GetInput(void)
 {
     if(!PAJ7620U2_HasInput) return Input_Type_None;
+    PAJ7620U2_HasInput = 0;
 
     uint8_t ges[2];
 
@@ -167,8 +164,6 @@ Input_Type PAJ7620U2_GetInput(void)
     IIC_ACK(1);
 
     IIC_Stop();
-
-    PAJ7620U2_HasInput = 0;
 
     switch ((uint16_t)ges[1]<<8 | ges[0])
     {

@@ -35,13 +35,13 @@ int main(void)
     Delay_1ms(100);
     RGB_ALL_OFF
 
-    for (;;)
+    while (1)
     {
         // 主程序
-        uint8_t hard = GUI_Start();
-        uint8_t gspd = 17-hard;
+        uint8_t difficulty = GUI_Start();
+        uint8_t gspd = 18-difficulty;
         uint32_t score = Tetris_MainGameLoop(gspd);
-        GUI_Gameover(hard);
+        GUI_Gameover(score);
     }
 }
 

@@ -172,7 +172,7 @@ void EXTI9_5_IRQHandler(void)
 
     if (EXTI_GetITStatus(EXTI_Line6) != RESET)
     {
-        for (uint32_t i = 0x1024; i > 0; i--);  // 延时消抖
+        for (uint32_t i = 0x16384; i > 0; i--);  // 延时消抖
         EXTI_ClearITPendingBit(EXTI_Line6); // 清除中断标志
 
         Button_HandleInt();

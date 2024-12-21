@@ -4,16 +4,24 @@
 #include "../oled/oled.h"
 
 #include <math.h>
+#include <stdio.h>
 
-extern uint8_t GuiStart[];
-extern uint8_t GuiGameover[];
+extern uint8_t GuiStartTitle[];
+extern uint8_t GuiStartMiddle[];
+extern uint8_t GuiStartTail[];
+extern uint8_t GuiGameoverTitle[];
+extern uint8_t GuiGameoverMiddle[];
+extern uint8_t GuiGameoverTail[];
 
 static uint8_t _guitim;
-static uint8_t _guiquit;
 
-static uint64_t _g_nums[3];
-static const uint8_t G_NumsShift = 62;
-static const uint8_t G_Nums[10][5] = {
+static const uint8_t Gui_TitleShift = 4;
+static const uint8_t Gui_TitleHeight = 23;
+static const uint8_t Gui_MiddleShift = 51;
+static const uint8_t Gui_TailShift = 114;
+static const uint8_t Gui_MiddleTailHeight = 7;
+static const uint8_t Gui_NumsShift = 62;
+static const uint8_t Gui_Nums[10][5] = {
     {0x7,0x5,0x5,0x5,0x7}, //0
     {0x3,0x2,0x2,0x2,0x7}, //1
     {0x7,0x4,0x7,0x1,0x7}, //2
@@ -33,19 +41,19 @@ static void _UpdateNums(uint32_t num);
 uint8_t GUI_Start(void)
 {
     _guitim = 0;
-    _guiquit = 0;
-    uint8_t result = 0;
+    uint8_t result;
     Input_Pop(); // 重置输入
-    OLED_DRAW_FULLSCREEN(GuiStart);
+    OLED_Clear();
+    OLED_DrawPic(GuiStartTitle, 0, 8, Gui_TitleShift, Gui_TitleHeight);
+    OLED_DrawPic(GuiStartMiddle, 0, 8, Gui_MiddleShift, Gui_MiddleTailHeight);
+    OLED_DrawPic(GuiStartTail, 0, 8, Gui_TailShift, Gui_MiddleTailHeight);
     while (1)
     {
         while (!_guitim) { }
 
-        // todo 难度 0-15
-        if (_guiquit) return result;
-        if (Input_Pop() == Input_Type_Button) _guiquit = 1;
-        result = ADCMod_GetKnob() * 16;
-        //result++;
+        result = ADCMod_GetKnob() / 256;
+        if (Input_Pop() == Input_Type_Button) return result;
+        
         _UpdateNums(result);
         
         _guitim = 0;
@@ -57,16 +65,17 @@ uint8_t GUI_Start(void)
 void GUI_Gameover(uint32_t score)
 {
     _guitim = 0;
-    _guiquit = 0;
     Input_Pop(); // 重置输入
-    OLED_DRAW_FULLSCREEN(GuiGameover);
+    OLED_Clear();
+    OLED_DrawPic(GuiGameoverTitle, 0, 8, Gui_TitleShift, Gui_TitleHeight);
+    OLED_DrawPic(GuiGameoverMiddle, 0, 8, Gui_MiddleShift, Gui_MiddleTailHeight);
+    OLED_DrawPic(GuiGameoverTail, 0, 8, Gui_TailShift, Gui_MiddleTailHeight);
     _UpdateNums(score);
     while (1)
     {
         while (!_guitim) { }
         
-        if (_guiquit) return;
-        if (Input_Pop() == Input_Type_Button) _guiquit = 1;
+        if (Input_Pop() == Input_Type_Button) return;
 
         _guitim = 0;
     }
@@ -79,24 +88,35 @@ void GUI_TimHandler(void)
 
 static void _UpdateNums(uint32_t num)
 {
+    uint64_t nums[3];
+
     for (uint8_t i = 0; i < 5; i++)
     {
-        _g_nums[i] = 0;
+        nums[i] = 0;
     }
 
-    uint8_t digit = num ? log10(num)+1 : 1;
+    // uint8_t digit = num ? log10f(num)+1 : 1;
+    uint8_t digit = 0;
+    for (uint32_t n = num; n; n /= 10)
+    {
+        digit++;
+    }
+    if(digit == 0) digit = 1;
+    
+
     uint8_t startpos = 28 + digit*2;
+    uint32_t n = num;
 
     for (uint8_t i = 0; i < digit; i++)
     {
         uint8_t pos = startpos - 4*i;
         for (uint8_t j = 0; j < 5; j++)
         {
-            _g_nums[j] |= ((uint64_t)G_Nums[num%10][j] << pos);
+            nums[j] |= ((uint64_t)Gui_Nums[n%10][j] << pos);
         }
         
-        num /= 10;
+        n /= 10;
     }
 
-    OLED_DrawPic((uint8_t*)(void*)_g_nums, 0, 8, G_NumsShift, 5);
+    OLED_DrawPic((uint8_t*)(void*)nums, 0, 8, Gui_NumsShift, 5);
 }

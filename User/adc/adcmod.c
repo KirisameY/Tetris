@@ -52,13 +52,13 @@ void ADCMod_Init(void)
     ADC_SoftwareStartConvCmd(ADC2, ENABLE);
 }
 
-double ADCMod_GetKnob(void)
+uint16_t ADCMod_GetKnob(void)
 {
     while (!ADC_GetFlagStatus(ADC2, ADC_FLAG_EOC)) ;
     uint16_t adc = ADC_GetConversionValue(ADC2);
     ADC_ClearFlag(ADC2, ADC_FLAG_EOC);
     ADC_SoftwareStartConvCmd(ADC2, ENABLE);
-    return (double)adc/4096.0;
+    return adc;
 }
 
 uint32_t ADCMod_GetRandom(void)
