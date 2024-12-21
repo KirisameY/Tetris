@@ -151,6 +151,8 @@ uint32_t Tetris_MainGameLoop(uint8_t timescale)
         Led_Flash_B();
         while (_time <= 0) ; // 防止重复执行
     }
+
+    return _score;
 }
 
 void Tetris_TimHandler(void)
