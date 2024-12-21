@@ -31,9 +31,11 @@
 .\objects\main.o: ..\User\led/bsp_gpio_led.h
 .\objects\main.o: ..\User\tim2/tim2.h
 .\objects\main.o: ..\User\systick/bsp_SysTick.h
+.\objects\main.o: ..\User\adc/adcmod.h
 .\objects\main.o: ..\User\iic/bsp_iic_debug.h
 .\objects\main.o: ..\User\oled/oled.h
 .\objects\main.o: ..\User\input/input.h
 .\objects\main.o: ..\User\random/random.h
+.\objects\main.o: ..\User\gui/gui.h
 .\objects\main.o: ..\User\tetris.h
 .\objects\main.o: ..\User\main.h

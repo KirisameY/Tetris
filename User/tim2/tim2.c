@@ -1,6 +1,7 @@
 #include "tim2.h"
 
 #include "../led/led_extension.h"
+#include "../gui/gui.h"
 #include "../tetris.h"
 
 #include "stm32f10x.h"
@@ -40,5 +41,6 @@ void TIM2_Init(void)
 void TIM2_IntHandler(void)
 {
     Tetris_TimHandler();
+    GUI_TimHandler();
     LedExtension_TimHandler();
 }

@@ -1,17 +1,13 @@
 #include "random.h"
+#include "../adc/adcmod.h"
 
 #include <stdlib.h>
 
 
 void Random_Init(void)
 {
-    // todo
-}
-
-void Random_ResetSeed(void)
-{
-    // todo
-    srand(0);
+    uint32_t seed = ADCMod_GetRandom();
+    srand(seed);
 }
 
 int Random_Next(int from, int to)

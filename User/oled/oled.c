@@ -113,13 +113,6 @@ void OLED_DrawPic(uint8_t *pic, uint8_t xpos, uint8_t width, uint8_t ypos, uint8
     IIC_Stop();
 }
 
-/// @brief 绘制UI边框图像
-/// @param
-void OLED_DrawGuiBorder(void)
-{
-    OLED_DrawPic(GuiBorder, 0, 8, 0, 128);
-}
-
 /// @brief 根据缓存更新屏幕显示
 /// @param
 void OLED_UpdateScreen(void)

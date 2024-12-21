@@ -7,10 +7,12 @@
 #include "led/bsp_gpio_led.h"
 #include "tim2/tim2.h"
 #include "systick/bsp_SysTick.h"
+#include "adc/adcmod.h"
 #include "iic/bsp_iic_debug.h"
 #include "oled/oled.h"
 #include "input/input.h"
 #include "random/random.h"
+#include "gui/gui.h"
 
 #include "tetris.h"
 #include "main.h"
@@ -23,27 +25,30 @@ int main(void)
     LED_GPIO_Config();   // 初始化LED引脚
     TIM2_Init();         // 初始化TIM2计时器
     Systick_Init();      // 初始化Systick
+    ADCMod_Init();       // 初始化ADC模块（电位计、随机数据引脚）
     IIC_GPIO_Config();   // 初始化IIC引脚
     OLED_Initialize();   // 初始化OLED屏幕
     Input_Init();        // 初始化输入模块
     Random_Init();       // 初始化随机模块
 
+    RGB_ALL_ON
+    Delay_1ms(100);
+    RGB_ALL_OFF
+
     for (;;)
     {
         // 主程序
-        RGB_ALL_ON
-        Delay_1ms(100);
-        RGB_ALL_OFF
-
-        Tetris_MainGameLoop(10);
+        uint8_t hard = GUI_Start();
+        uint8_t gspd = 17-hard;
+        uint32_t score = Tetris_MainGameLoop(gspd);
+        GUI_Gameover(hard);
     }
 }
 
-/// @brief 锁死程序并打出异常（目前只做了锁死程序和亮个警报灯）
+/// @brief 锁死程序并打出异常（未实装）
 /// @param msg 异常信息(未实装)
 void exception(char *msg)
 {
-    // 回头有必要的话整个串口打印异常信息，没必要就算了
     R_LED_ON_ONLY
     for (;;) ; // 锁死程序
 }

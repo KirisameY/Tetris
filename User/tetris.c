@@ -137,11 +137,6 @@ uint32_t Tetris_MainGameLoop(uint8_t timescale)
     // 游戏主循环
     while (_gameLoop)
     {
-        // todo: 要等待一定时间间隔，进行一次时间流逝判定（计时器整上）；
-        //       有输入时应当立即处理输入并视情况重置计时（如输入了指令“下”方块下落至底部时）；
-        //       时间判定和输入处理后应当立刻执行一次显示更新
-        //       输入和时间可以闪一下绿/蓝灯
-
         while(_time > 0) // 帧时间
         {
             Input_Type input = Input_Pop();
@@ -191,8 +186,8 @@ static void _InitializeGameState(void)
     _gameLoop = 1;
     _time = 1; // 初始化时给一帧缓冲时间
 
-    // 重置随机数种子
-    Random_ResetSeed();
+    // 清除现有输入，以防误输入
+    Input_Pop();
 
     OLED_ForceUpdateScreen(); // 初始化显示，会同时重置scr_dirty
 }
@@ -344,7 +339,7 @@ void _AfterDrop(void)
     if (cleared != 0)
     {
         _gDirty |= 0x01;
-        _score += pow(2, cleared) * _gameSpd; // *10/10约掉
+        _score += pow(2, cleared) * (19-_gameSpd);
     }
 
     // 判定gameover

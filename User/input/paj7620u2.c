@@ -152,7 +152,6 @@ void PAJ7620U2_HandleInt(void)
 Input_Type PAJ7620U2_GetInput(void)
 {
     if(!PAJ7620U2_HasInput) return Input_Type_None;
-    PAJ7620U2_HasInput = 0;
 
     uint8_t ges[2];
 
@@ -168,6 +167,8 @@ Input_Type PAJ7620U2_GetInput(void)
     IIC_ACK(1);
 
     IIC_Stop();
+
+    PAJ7620U2_HasInput = 0;
 
     switch ((uint16_t)ges[1]<<8 | ges[0])
     {
