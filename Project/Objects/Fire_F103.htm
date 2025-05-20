@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Fire_F103.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Fire_F103.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue May 20 09:58:11 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue May 20 10:26:39 2025
 <BR><P>
 <H3>Maximum Stack Usage =        320 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -237,6 +237,7 @@ Global Symbols
 <LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_UpdateNums
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_InitializeGameState
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Draw
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_CalculateGridLine
 </UL>
 
@@ -1052,7 +1053,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PAJ7620U2_Init
 <LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_DrawPic
-<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
+<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 </UL>
 
 <P><STRONG><a name="[88]"></a>free</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, malloc.o(i.free))
@@ -1172,28 +1173,30 @@ Local Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_TryRotateCurrent
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_TryMoveCurrent
-<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
 </UL>
 
-<P><STRONG><a name="[99]"></a>_Draw</STRONG> (Thumb, 644 bytes, Stack size 24 bytes, tetris.o(i._Draw))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = _Draw &rArr; OLED_UpdateScreen &rArr; IIC_SendByte
+<P><STRONG><a name="[99]"></a>_Draw</STRONG> (Thumb, 816 bytes, Stack size 48 bytes, tetris.o(i._Draw))
+<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = _Draw &rArr; _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
-<BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_UpdateScreen
+<BR>[Calls]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
+<LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_UpdateScreen
+<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_CalculateGridLine
 </UL>
 <BR>[Called By]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_MainGameLoop
 </UL>
 
-<P><STRONG><a name="[9f]"></a>_FastDrop</STRONG> (Thumb, 374 bytes, Stack size 24 bytes, tetris.o(i._FastDrop))
+<P><STRONG><a name="[a0]"></a>_FastDrop</STRONG> (Thumb, 374 bytes, Stack size 24 bytes, tetris.o(i._FastDrop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = _FastDrop &rArr; _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
-<BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
+<BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_DetectCollision
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Time
 </UL>
 
-<P><STRONG><a name="[a0]"></a>_GetBlockRealPos</STRONG> (Thumb, 82 bytes, Stack size 32 bytes, tetris.o(i._GetBlockRealPos))
+<P><STRONG><a name="[9f]"></a>_GetBlockRealPos</STRONG> (Thumb, 82 bytes, Stack size 32 bytes, tetris.o(i._GetBlockRealPos))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
 <BR>[Calls]<UL><LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exception
@@ -1201,7 +1204,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_TryRotateCurrent
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_TryMoveCurrent
 <LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_SaveSwitch
-<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Draw
 </UL>
 
 <P><STRONG><a name="[97]"></a>_InitializeGameState</STRONG> (Thumb, 156 bytes, Stack size 24 bytes, tetris.o(i._InitializeGameState))
@@ -1228,7 +1232,7 @@ Local Symbols
 <P><STRONG><a name="[a2]"></a>_SaveSwitch</STRONG> (Thumb, 210 bytes, Stack size 24 bytes, tetris.o(i._SaveSwitch))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = _SaveSwitch &rArr; _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
-<BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
+<BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 </UL>
 <BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Input
 </UL>
@@ -1238,7 +1242,7 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_UpdateNext
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_TryMoveCurrent
-<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_FastDrop
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_AfterDrop
 </UL>
 <BR>[Called By]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Tetris_MainGameLoop
@@ -1247,7 +1251,7 @@ Local Symbols
 <P><STRONG><a name="[a3]"></a>_TryMoveCurrent</STRONG> (Thumb, 372 bytes, Stack size 32 bytes, tetris.o(i._TryMoveCurrent))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = _TryMoveCurrent &rArr; _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
-<BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
+<BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_DetectCollision
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Time
@@ -1257,7 +1261,7 @@ Local Symbols
 <P><STRONG><a name="[a4]"></a>_TryRotateCurrent</STRONG> (Thumb, 544 bytes, Stack size 32 bytes, tetris.o(i._TryRotateCurrent))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = _TryRotateCurrent &rArr; _GetBlockRealPos &rArr; exception &rArr; LED_ON
 </UL>
-<BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
+<BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_GetBlockRealPos
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_DetectCollision
 </UL>
 <BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_Input

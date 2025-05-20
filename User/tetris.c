@@ -594,6 +594,22 @@ static void _Draw(void)
         _gameGrid[i] &= 0x7fff; // 清除脏标记
     }
 
+    // 当前块特殊显示
+    if (_currentBlock != BlockType_None)
+    {
+        int8_t blocks[4][2];
+        _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
+        for (uint8_t i = 0; i < 4; i++)
+        {
+            if (blocks[i][1] >= 20) continue;
+            uint8_t scr_h = GG_GRIDCELL_SHIFT_V + (19-blocks[i][1])*5;
+            uint64_t cellv = (uint64_t)0x06 << (5 * (blocks[i][0]+1));
+            scr_Cache[scr_h+2] &= ~cellv;
+            scr_Cache[scr_h+3] &= ~cellv;
+            /* code */
+        }
+    }
+
     // 清除脏标记
     _gDirty = 0;
 
