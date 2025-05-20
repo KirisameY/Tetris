@@ -15,12 +15,18 @@ extern uint8_t GuiGameoverTail[];
 
 static uint8_t _guitim;
 
-static const uint8_t Gui_TitleShift = 4;
-static const uint8_t Gui_TitleHeight = 23;
-static const uint8_t Gui_MiddleShift = 51;
-static const uint8_t Gui_TailShift = 114;
-static const uint8_t Gui_MiddleTailHeight = 7;
-static const uint8_t Gui_NumsShift = 62;
+// static const uint8_t Gui_TitleShift = 4;
+// static const uint8_t Gui_TitleHeight = 23;
+// static const uint8_t Gui_MiddleShift = 51;
+// static const uint8_t Gui_TailShift = 114;
+// static const uint8_t Gui_MiddleTailHeight = 7;
+// static const uint8_t Gui_NumsShift = 62;
+#define GUI_TITLE_SHIFT 4
+#define GUI_TITLE_HEIGHT 23
+#define GUI_MIDDLE_SHIFT 51
+#define GUI_TAIL_SHIFT 114
+#define GUI_MIDDLE_TAIL_HEIGHT 7
+#define GUI_NUMS_SHIFT 62
 static const uint8_t Gui_Nums[10][5] = {
     {0x7,0x5,0x5,0x5,0x7}, //0
     {0x3,0x2,0x2,0x2,0x7}, //1
@@ -44,9 +50,9 @@ uint8_t GUI_Start(void)
     uint8_t result;
     Input_Pop(); // 重置输入
     OLED_Clear();
-    OLED_DrawPic(GuiStartTitle, 0, 8, Gui_TitleShift, Gui_TitleHeight);
-    OLED_DrawPic(GuiStartMiddle, 0, 8, Gui_MiddleShift, Gui_MiddleTailHeight);
-    OLED_DrawPic(GuiStartTail, 0, 8, Gui_TailShift, Gui_MiddleTailHeight);
+    OLED_DrawPic(GuiStartTitle, 0, 8, GUI_TITLE_SHIFT, GUI_TITLE_HEIGHT);
+    OLED_DrawPic(GuiStartMiddle, 0, 8, GUI_MIDDLE_SHIFT, GUI_MIDDLE_TAIL_HEIGHT);
+    OLED_DrawPic(GuiStartTail, 0, 8, GUI_TAIL_SHIFT, GUI_MIDDLE_TAIL_HEIGHT);
     while (1)
     {
         while (!_guitim) { }
@@ -67,9 +73,9 @@ void GUI_Gameover(uint32_t score)
     _guitim = 0;
     Input_Pop(); // 重置输入
     OLED_Clear();
-    OLED_DrawPic(GuiGameoverTitle, 0, 8, Gui_TitleShift, Gui_TitleHeight);
-    OLED_DrawPic(GuiGameoverMiddle, 0, 8, Gui_MiddleShift, Gui_MiddleTailHeight);
-    OLED_DrawPic(GuiGameoverTail, 0, 8, Gui_TailShift, Gui_MiddleTailHeight);
+    OLED_DrawPic(GuiGameoverTitle, 0, 8, GUI_TITLE_SHIFT, GUI_TITLE_HEIGHT);
+    OLED_DrawPic(GuiGameoverMiddle, 0, 8, GUI_MIDDLE_SHIFT, GUI_MIDDLE_TAIL_HEIGHT);
+    OLED_DrawPic(GuiGameoverTail, 0, 8, GUI_TAIL_SHIFT, GUI_MIDDLE_TAIL_HEIGHT);
     _UpdateNums(score);
     while (1)
     {
@@ -118,5 +124,5 @@ static void _UpdateNums(uint32_t num)
         n /= 10;
     }
 
-    OLED_DrawPic((uint8_t*)(void*)nums, 0, 8, Gui_NumsShift, 5);
+    OLED_DrawPic((uint8_t*)(void*)nums, 0, 8, GUI_NUMS_SHIFT, 5);
 }

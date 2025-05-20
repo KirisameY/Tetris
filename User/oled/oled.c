@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 uint64_t scr_Cache[128]; // 图像缓存
-uint8_t scr_Dirty[16];     // 脏标记(每个位代表一个列)
+uint8_t scr_Dirty[16];   // 脏标记(每个位代表一个列)
 
 /// @brief 初始化OLED
 /// @param

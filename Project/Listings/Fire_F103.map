@@ -119,11 +119,10 @@ Section Cross References
     tetris.o(i._AfterDrop) refers to dfltui.o(.text) for __aeabi_ui2d
     tetris.o(i._AfterDrop) refers to pow.o(i.pow) for pow
     tetris.o(i._AfterDrop) refers to dmul.o(.text) for __aeabi_dmul
-    tetris.o(i._AfterDrop) refers to dadd.o(.text) for __aeabi_dadd
     tetris.o(i._AfterDrop) refers to dfixui.o(.text) for __aeabi_d2uiz
     tetris.o(i._AfterDrop) refers to tetris.o(.data) for _saveSwitched
     tetris.o(i._AfterDrop) refers to tetris.o(.bss) for _gameGrid
-    tetris.o(i._CalculateGridLine) refers to tetris.o(.constdata) for G_GridCells
+    tetris.o(i._CalculateGridLine) refers to llshl.o(.text) for __aeabi_llsl
     tetris.o(i._CalculateGridLine) refers to oled.o(.bss) for scr_Dirty
     tetris.o(i._DetectCollision) refers to tetris.o(.bss) for _gameGrid
     tetris.o(i._Draw) refers to tetris.o(i._CalculateGridLine) for _CalculateGridLine
@@ -149,7 +148,7 @@ Section Cross References
     tetris.o(i._Input) refers to tetris.o(i._TryMoveCurrent) for _TryMoveCurrent
     tetris.o(i._Input) refers to tetris.o(i._TryRotateCurrent) for _TryRotateCurrent
     tetris.o(i._Input) refers to led_extension.o(i.Led_Flash_G) for Led_Flash_G
-    tetris.o(i._Input) refers to tetris.o(.data) for _fastDrop
+    tetris.o(i._Input) refers to tetris.o(.data) for _gameFlags
     tetris.o(i._SaveSwitch) refers to tetris.o(i._GetBlockRealPos) for _GetBlockRealPos
     tetris.o(i._SaveSwitch) refers to tetris.o(.data) for _saveSwitched
     tetris.o(i._SaveSwitch) refers to tetris.o(.bss) for _gameGrid
@@ -382,10 +381,6 @@ Section Cross References
     mallocra.o(i.__realloc$memalign) refers to mvars.o(.data) for __microlib_freelist
     mallocra.o(i.internal_alloc) refers to memcpya.o(.text) for __aeabi_memcpy
     mallocra.o(i.internal_alloc) refers to mvars.o(.data) for __microlib_freelist
-    dadd.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
-    dadd.o(.text) refers to llshl.o(.text) for __aeabi_llsl
-    dadd.o(.text) refers to llsshr.o(.text) for __aeabi_lasr
-    dadd.o(.text) refers to depilogue.o(.text) for _double_epilogue
     dmul.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
     dmul.o(.text) refers to depilogue.o(.text) for _double_epilogue
     dflti.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
@@ -432,6 +427,9 @@ Section Cross References
     errno.o(i.__set_errno) refers to errno.o(.data) for .data
     depilogue.o(.text) refers to llshl.o(.text) for __aeabi_llsl
     depilogue.o(.text) refers to llushr.o(.text) for __aeabi_llsr
+    dadd.o(.text) refers to llshl.o(.text) for __aeabi_llsl
+    dadd.o(.text) refers to llsshr.o(.text) for __aeabi_lasr
+    dadd.o(.text) refers to depilogue.o(.text) for _double_epilogue
     ddiv.o(.text) refers to depilogue.o(.text) for _double_round
     init.o(.text) refers to entry5.o(.ARM.Collect$$$$00000004) for __main_after_scatterload
     dsqrt.o(.text) refers to llushr.o(.text) for __aeabi_llsr
@@ -906,30 +904,30 @@ Image Symbol Table
 
     ../clib/../cmprslib/zerorunl2.c          0x00000000   Number         0  __dczerorl2.o ABSOLUTE
     ../clib/microlib/errno.c                 0x00000000   Number         0  errno.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
-    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocr.o ABSOLUTE
-    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocra.o ABSOLUTE
-    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  malloca.o ABSOLUTE
     ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  malloc.o ABSOLUTE
+    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  malloca.o ABSOLUTE
+    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocra.o ABSOLUTE
+    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocr.o ABSOLUTE
     ../clib/microlib/malloc/mvars.c          0x00000000   Number         0  mvars.o ABSOLUTE
     ../clib/microlib/stdlib/rand.c           0x00000000   Number         0  rand.o ABSOLUTE
-    ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpyb.o ABSOLUTE
     ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpya.o ABSOLUTE
+    ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpyb.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
     ../fplib/microlib/fpadd.c                0x00000000   Number         0  dadd.o ABSOLUTE
     ../fplib/microlib/fpdiv.c                0x00000000   Number         0  ddiv.o ABSOLUTE
@@ -946,8 +944,8 @@ Image Symbol Table
     ../mathlib/pow.c                         0x00000000   Number         0  pow.o ABSOLUTE
     ../mathlib/pow.c                         0x00000000   Number         0  pow_x.o ABSOLUTE
     ../mathlib/qnan.c                        0x00000000   Number         0  qnan.o ABSOLUTE
-    ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt_x.o ABSOLUTE
     ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt.o ABSOLUTE
+    ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt_x.o ABSOLUTE
     ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\arm\startup_stm32f10x_md.s 0x00000000   Number         0  startup_stm32f10x_md.o ABSOLUTE
     ..\Libraries\STM32F10x_StdPeriph_Driver\src\misc.c 0x00000000   Number         0  misc.o ABSOLUTE
     ..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_adc.c 0x00000000   Number         0  stm32f10x_adc.o ABSOLUTE
@@ -1006,19 +1004,19 @@ Image Symbol Table
     .text                                    0x08000100   Section       36  startup_stm32f10x_md.o(.text)
     .text                                    0x08000124   Section        0  llshl.o(.text)
     .text                                    0x08000144   Section        0  rand.o(.text)
-    .text                                    0x08000168   Section        0  dadd.o(.text)
-    .text                                    0x080002b6   Section        0  dmul.o(.text)
-    .text                                    0x0800039a   Section        0  dflti.o(.text)
-    .text                                    0x080003bc   Section        0  dfltui.o(.text)
-    .text                                    0x080003d6   Section        0  dfixui.o(.text)
-    .text                                    0x08000408   Section        0  llushr.o(.text)
-    .text                                    0x08000428   Section        0  llsshr.o(.text)
-    .text                                    0x0800044c   Section        0  iusefp.o(.text)
-    .text                                    0x0800044c   Section        0  depilogue.o(.text)
-    .text                                    0x08000506   Section        0  ddiv.o(.text)
-    .text                                    0x080005e4   Section        0  dscalb.o(.text)
-    .text                                    0x08000614   Section       48  cdrcmple.o(.text)
-    .text                                    0x08000644   Section       36  init.o(.text)
+    .text                                    0x08000168   Section        0  dmul.o(.text)
+    .text                                    0x0800024c   Section        0  dflti.o(.text)
+    .text                                    0x0800026e   Section        0  dfltui.o(.text)
+    .text                                    0x08000288   Section        0  dfixui.o(.text)
+    .text                                    0x080002ba   Section        0  llushr.o(.text)
+    .text                                    0x080002da   Section        0  iusefp.o(.text)
+    .text                                    0x080002da   Section        0  depilogue.o(.text)
+    .text                                    0x08000394   Section        0  dadd.o(.text)
+    .text                                    0x080004e2   Section        0  ddiv.o(.text)
+    .text                                    0x080005c0   Section        0  dscalb.o(.text)
+    .text                                    0x080005f0   Section       48  cdrcmple.o(.text)
+    .text                                    0x08000620   Section       36  init.o(.text)
+    .text                                    0x08000644   Section        0  llsshr.o(.text)
     .text                                    0x08000668   Section        0  dsqrt.o(.text)
     .text                                    0x0800070a   Section        0  __dczerorl2.o(.text)
     i.ADCMod_GetKnob                         0x08000760   Section        0  adcmod.o(i.ADCMod_GetKnob)
@@ -1118,67 +1116,66 @@ Image Symbol Table
     i.TimingDelay_Decrement                  0x08001f8c   Section        0  bsp_systick.o(i.TimingDelay_Decrement)
     i.UsageFault_Handler                     0x08001fa4   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
     i._AfterDrop                             0x08001fa8   Section        0  tetris.o(i._AfterDrop)
-    _AfterDrop                               0x08001fa9   Thumb Code   284  tetris.o(i._AfterDrop)
+    _AfterDrop                               0x08001fa9   Thumb Code   278  tetris.o(i._AfterDrop)
     i._CalculateGridLine                     0x080020dc   Section        0  tetris.o(i._CalculateGridLine)
-    _CalculateGridLine                       0x080020dd   Thumb Code   218  tetris.o(i._CalculateGridLine)
-    i._DetectCollision                       0x080021c8   Section        0  tetris.o(i._DetectCollision)
-    _DetectCollision                         0x080021c9   Thumb Code    76  tetris.o(i._DetectCollision)
-    i._Draw                                  0x08002218   Section        0  tetris.o(i._Draw)
-    _Draw                                    0x08002219   Thumb Code   644  tetris.o(i._Draw)
-    i._FastDrop                              0x080024c8   Section        0  tetris.o(i._FastDrop)
-    _FastDrop                                0x080024c9   Thumb Code   370  tetris.o(i._FastDrop)
-    i._GetBlockRealPos                       0x08002650   Section        0  tetris.o(i._GetBlockRealPos)
-    _GetBlockRealPos                         0x08002651   Thumb Code    82  tetris.o(i._GetBlockRealPos)
-    i._InitializeGameState                   0x080026d0   Section        0  tetris.o(i._InitializeGameState)
-    _InitializeGameState                     0x080026d1   Thumb Code   156  tetris.o(i._InitializeGameState)
-    i._Input                                 0x080027a0   Section        0  tetris.o(i._Input)
-    _Input                                   0x080027a1   Thumb Code    94  tetris.o(i._Input)
-    i._SaveSwitch                            0x08002808   Section        0  tetris.o(i._SaveSwitch)
-    _SaveSwitch                              0x08002809   Thumb Code   210  tetris.o(i._SaveSwitch)
-    i._Time                                  0x080028fc   Section        0  tetris.o(i._Time)
-    _Time                                    0x080028fd   Thumb Code    84  tetris.o(i._Time)
-    i._TryMoveCurrent                        0x08002964   Section        0  tetris.o(i._TryMoveCurrent)
-    _TryMoveCurrent                          0x08002965   Thumb Code   372  tetris.o(i._TryMoveCurrent)
-    i._TryRotateCurrent                      0x08002aec   Section        0  tetris.o(i._TryRotateCurrent)
-    _TryRotateCurrent                        0x08002aed   Thumb Code   532  tetris.o(i._TryRotateCurrent)
-    i._UpdateNext                            0x08002d14   Section        0  tetris.o(i._UpdateNext)
-    _UpdateNext                              0x08002d15   Thumb Code    82  tetris.o(i._UpdateNext)
-    i._UpdateNums                            0x08002d7c   Section        0  gui.o(i._UpdateNums)
-    _UpdateNums                              0x08002d7d   Thumb Code   190  gui.o(i._UpdateNums)
-    i.__ARM_fpclassify                       0x08002e40   Section        0  fpclassify.o(i.__ARM_fpclassify)
-    i.__kernel_poly                          0x08002e68   Section        0  poly.o(i.__kernel_poly)
-    i.__mathlib_dbl_divzero                  0x08002f14   Section        0  dunder.o(i.__mathlib_dbl_divzero)
-    i.__mathlib_dbl_infnan2                  0x08002f24   Section        0  dunder.o(i.__mathlib_dbl_infnan2)
-    i.__mathlib_dbl_invalid                  0x08002f28   Section        0  dunder.o(i.__mathlib_dbl_invalid)
-    i.__mathlib_dbl_overflow                 0x08002f34   Section        0  dunder.o(i.__mathlib_dbl_overflow)
-    i.__mathlib_dbl_underflow                0x08002f44   Section        0  dunder.o(i.__mathlib_dbl_underflow)
-    i.__scatterload_copy                     0x08002f54   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x08002f62   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x08002f64   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.__set_errno                            0x08002f74   Section        0  errno.o(i.__set_errno)
-    i.exception                              0x08002f80   Section        0  main.o(i.exception)
-    i.free                                   0x08002fa0   Section        0  malloc.o(i.free)
-    i.main                                   0x08002ff0   Section        0  main.o(i.main)
-    i.malloc                                 0x08003070   Section        0  malloc.o(i.malloc)
-    i.pow                                    0x080030dc   Section        0  pow.o(i.pow)
-    i.sqrt                                   0x08003ab4   Section        0  sqrt.o(i.sqrt)
-    .constdata                               0x08003b00   Section      206  tetris.o(.constdata)
-    G_GridCells                              0x08003b00   Data          80  tetris.o(.constdata)
-    G_BlockPreviews                          0x08003b50   Data          32  tetris.o(.constdata)
-    G_Nums                                   0x08003b70   Data          30  tetris.o(.constdata)
-    Blocks                                   0x08003b8e   Data          64  tetris.o(.constdata)
-    .constdata                               0x08003bce   Section      162  paj7620u2.o(.constdata)
-    InitCmd                                  0x08003bce   Data         102  paj7620u2.o(.constdata)
-    GestureInitCmd                           0x08003c34   Data          60  paj7620u2.o(.constdata)
-    .constdata                               0x08003c70   Section       50  gui.o(.constdata)
-    Gui_Nums                                 0x08003c70   Data          50  gui.o(.constdata)
-    .constdata                               0x08003ca8   Section      136  pow.o(.constdata)
-    bp                                       0x08003ca8   Data          16  pow.o(.constdata)
-    dp_h                                     0x08003cb8   Data          16  pow.o(.constdata)
-    dp_l                                     0x08003cc8   Data          16  pow.o(.constdata)
-    L                                        0x08003cd8   Data          48  pow.o(.constdata)
-    P                                        0x08003d08   Data          40  pow.o(.constdata)
-    .constdata                               0x08003d30   Section        8  qnan.o(.constdata)
+    _CalculateGridLine                       0x080020dd   Thumb Code   242  tetris.o(i._CalculateGridLine)
+    i._DetectCollision                       0x080021dc   Section        0  tetris.o(i._DetectCollision)
+    _DetectCollision                         0x080021dd   Thumb Code    76  tetris.o(i._DetectCollision)
+    i._Draw                                  0x0800222c   Section        0  tetris.o(i._Draw)
+    _Draw                                    0x0800222d   Thumb Code   644  tetris.o(i._Draw)
+    i._FastDrop                              0x080024dc   Section        0  tetris.o(i._FastDrop)
+    _FastDrop                                0x080024dd   Thumb Code   374  tetris.o(i._FastDrop)
+    i._GetBlockRealPos                       0x08002668   Section        0  tetris.o(i._GetBlockRealPos)
+    _GetBlockRealPos                         0x08002669   Thumb Code    82  tetris.o(i._GetBlockRealPos)
+    i._InitializeGameState                   0x080026e8   Section        0  tetris.o(i._InitializeGameState)
+    _InitializeGameState                     0x080026e9   Thumb Code   156  tetris.o(i._InitializeGameState)
+    i._Input                                 0x080027b8   Section        0  tetris.o(i._Input)
+    _Input                                   0x080027b9   Thumb Code   112  tetris.o(i._Input)
+    i._SaveSwitch                            0x08002830   Section        0  tetris.o(i._SaveSwitch)
+    _SaveSwitch                              0x08002831   Thumb Code   210  tetris.o(i._SaveSwitch)
+    i._Time                                  0x08002924   Section        0  tetris.o(i._Time)
+    _Time                                    0x08002925   Thumb Code   124  tetris.o(i._Time)
+    i._TryMoveCurrent                        0x080029b4   Section        0  tetris.o(i._TryMoveCurrent)
+    _TryMoveCurrent                          0x080029b5   Thumb Code   372  tetris.o(i._TryMoveCurrent)
+    i._TryRotateCurrent                      0x08002b3c   Section        0  tetris.o(i._TryRotateCurrent)
+    _TryRotateCurrent                        0x08002b3d   Thumb Code   544  tetris.o(i._TryRotateCurrent)
+    i._UpdateNext                            0x08002d74   Section        0  tetris.o(i._UpdateNext)
+    _UpdateNext                              0x08002d75   Thumb Code    82  tetris.o(i._UpdateNext)
+    i._UpdateNums                            0x08002ddc   Section        0  gui.o(i._UpdateNums)
+    _UpdateNums                              0x08002ddd   Thumb Code   190  gui.o(i._UpdateNums)
+    i.__ARM_fpclassify                       0x08002ea0   Section        0  fpclassify.o(i.__ARM_fpclassify)
+    i.__kernel_poly                          0x08002ec8   Section        0  poly.o(i.__kernel_poly)
+    i.__mathlib_dbl_divzero                  0x08002f74   Section        0  dunder.o(i.__mathlib_dbl_divzero)
+    i.__mathlib_dbl_infnan2                  0x08002f84   Section        0  dunder.o(i.__mathlib_dbl_infnan2)
+    i.__mathlib_dbl_invalid                  0x08002f88   Section        0  dunder.o(i.__mathlib_dbl_invalid)
+    i.__mathlib_dbl_overflow                 0x08002f94   Section        0  dunder.o(i.__mathlib_dbl_overflow)
+    i.__mathlib_dbl_underflow                0x08002fa4   Section        0  dunder.o(i.__mathlib_dbl_underflow)
+    i.__scatterload_copy                     0x08002fb4   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x08002fc2   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x08002fc4   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.__set_errno                            0x08002fd4   Section        0  errno.o(i.__set_errno)
+    i.exception                              0x08002fe0   Section        0  main.o(i.exception)
+    i.free                                   0x08003000   Section        0  malloc.o(i.free)
+    i.main                                   0x08003050   Section        0  main.o(i.main)
+    i.malloc                                 0x080030d0   Section        0  malloc.o(i.malloc)
+    i.pow                                    0x0800313c   Section        0  pow.o(i.pow)
+    i.sqrt                                   0x08003b14   Section        0  sqrt.o(i.sqrt)
+    .constdata                               0x08003b60   Section      126  tetris.o(.constdata)
+    GG_BlockPreviews                         0x08003b60   Data          32  tetris.o(.constdata)
+    G_Nums                                   0x08003b80   Data          30  tetris.o(.constdata)
+    Blocks                                   0x08003b9e   Data          64  tetris.o(.constdata)
+    .constdata                               0x08003bde   Section      162  paj7620u2.o(.constdata)
+    InitCmd                                  0x08003bde   Data         102  paj7620u2.o(.constdata)
+    GestureInitCmd                           0x08003c44   Data          60  paj7620u2.o(.constdata)
+    .constdata                               0x08003c80   Section       50  gui.o(.constdata)
+    Gui_Nums                                 0x08003c80   Data          50  gui.o(.constdata)
+    .constdata                               0x08003cb8   Section      136  pow.o(.constdata)
+    bp                                       0x08003cb8   Data          16  pow.o(.constdata)
+    dp_h                                     0x08003cc8   Data          16  pow.o(.constdata)
+    dp_l                                     0x08003cd8   Data          16  pow.o(.constdata)
+    L                                        0x08003ce8   Data          48  pow.o(.constdata)
+    P                                        0x08003d18   Data          40  pow.o(.constdata)
+    .constdata                               0x08003d40   Section        8  qnan.o(.constdata)
     .data                                    0x20000000   Section       20  system_stm32f10x.o(.data)
     .data                                    0x20000014   Section       24  tetris.o(.data)
     _score                                   0x20000014   Data           4  tetris.o(.data)
@@ -1192,7 +1189,7 @@ Image Symbol Table
     _time                                    0x2000001f   Data           1  tetris.o(.data)
     _gameSpd                                 0x20000020   Data           1  tetris.o(.data)
     _gameLoop                                0x20000021   Data           1  tetris.o(.data)
-    _fastDrop                                0x20000022   Data           1  tetris.o(.data)
+    _gameFlags                               0x20000022   Data           1  tetris.o(.data)
     _saveSwitched                            0x20000023   Data           1  tetris.o(.data)
     _blockBag                                0x20000024   Data           7  tetris.o(.data)
     _blockBagPos                             0x2000002b   Data           1  tetris.o(.data)
@@ -1289,26 +1286,26 @@ Image Symbol Table
     _ll_shift_l                              0x08000125   Thumb Code     0  llshl.o(.text)
     rand                                     0x08000145   Thumb Code    20  rand.o(.text)
     srand                                    0x08000159   Thumb Code     6  rand.o(.text)
-    __aeabi_dadd                             0x08000169   Thumb Code   322  dadd.o(.text)
-    __aeabi_dsub                             0x080002ab   Thumb Code     6  dadd.o(.text)
-    __aeabi_drsub                            0x080002b1   Thumb Code     6  dadd.o(.text)
-    __aeabi_dmul                             0x080002b7   Thumb Code   228  dmul.o(.text)
-    __aeabi_i2d                              0x0800039b   Thumb Code    34  dflti.o(.text)
-    __aeabi_ui2d                             0x080003bd   Thumb Code    26  dfltui.o(.text)
-    __aeabi_d2uiz                            0x080003d7   Thumb Code    50  dfixui.o(.text)
-    __aeabi_llsr                             0x08000409   Thumb Code    32  llushr.o(.text)
-    _ll_ushift_r                             0x08000409   Thumb Code     0  llushr.o(.text)
-    __aeabi_lasr                             0x08000429   Thumb Code    36  llsshr.o(.text)
-    _ll_sshift_r                             0x08000429   Thumb Code     0  llsshr.o(.text)
-    __I$use$fp                               0x0800044d   Thumb Code     0  iusefp.o(.text)
-    _double_round                            0x0800044d   Thumb Code    30  depilogue.o(.text)
-    _double_epilogue                         0x0800046b   Thumb Code   156  depilogue.o(.text)
-    __aeabi_ddiv                             0x08000507   Thumb Code   222  ddiv.o(.text)
-    __ARM_scalbn                             0x080005e5   Thumb Code    46  dscalb.o(.text)
-    scalbn                                   0x080005e5   Thumb Code     0  dscalb.o(.text)
-    __aeabi_cdrcmple                         0x08000615   Thumb Code    48  cdrcmple.o(.text)
-    __scatterload                            0x08000645   Thumb Code    28  init.o(.text)
-    __scatterload_rt2                        0x08000645   Thumb Code     0  init.o(.text)
+    __aeabi_dmul                             0x08000169   Thumb Code   228  dmul.o(.text)
+    __aeabi_i2d                              0x0800024d   Thumb Code    34  dflti.o(.text)
+    __aeabi_ui2d                             0x0800026f   Thumb Code    26  dfltui.o(.text)
+    __aeabi_d2uiz                            0x08000289   Thumb Code    50  dfixui.o(.text)
+    __aeabi_llsr                             0x080002bb   Thumb Code    32  llushr.o(.text)
+    _ll_ushift_r                             0x080002bb   Thumb Code     0  llushr.o(.text)
+    __I$use$fp                               0x080002db   Thumb Code     0  iusefp.o(.text)
+    _double_round                            0x080002db   Thumb Code    30  depilogue.o(.text)
+    _double_epilogue                         0x080002f9   Thumb Code   156  depilogue.o(.text)
+    __aeabi_dadd                             0x08000395   Thumb Code   322  dadd.o(.text)
+    __aeabi_dsub                             0x080004d7   Thumb Code     6  dadd.o(.text)
+    __aeabi_drsub                            0x080004dd   Thumb Code     6  dadd.o(.text)
+    __aeabi_ddiv                             0x080004e3   Thumb Code   222  ddiv.o(.text)
+    __ARM_scalbn                             0x080005c1   Thumb Code    46  dscalb.o(.text)
+    scalbn                                   0x080005c1   Thumb Code     0  dscalb.o(.text)
+    __aeabi_cdrcmple                         0x080005f1   Thumb Code    48  cdrcmple.o(.text)
+    __scatterload                            0x08000621   Thumb Code    28  init.o(.text)
+    __scatterload_rt2                        0x08000621   Thumb Code     0  init.o(.text)
+    __aeabi_lasr                             0x08000645   Thumb Code    36  llsshr.o(.text)
+    _ll_sshift_r                             0x08000645   Thumb Code     0  llsshr.o(.text)
     _dsqrt                                   0x08000669   Thumb Code   162  dsqrt.o(.text)
     __decompress                             0x0800070b   Thumb Code     0  __dczerorl2.o(.text)
     __decompress1                            0x0800070b   Thumb Code    86  __dczerorl2.o(.text)
@@ -1390,26 +1387,26 @@ Image Symbol Table
     Tetris_TimHandler                        0x08001f69   Thumb Code    28  tetris.o(i.Tetris_TimHandler)
     TimingDelay_Decrement                    0x08001f8d   Thumb Code    18  bsp_systick.o(i.TimingDelay_Decrement)
     UsageFault_Handler                       0x08001fa5   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
-    __ARM_fpclassify                         0x08002e41   Thumb Code    40  fpclassify.o(i.__ARM_fpclassify)
-    __kernel_poly                            0x08002e69   Thumb Code   170  poly.o(i.__kernel_poly)
-    __mathlib_dbl_divzero                    0x08002f15   Thumb Code    12  dunder.o(i.__mathlib_dbl_divzero)
-    __mathlib_dbl_infnan2                    0x08002f25   Thumb Code     4  dunder.o(i.__mathlib_dbl_infnan2)
-    __mathlib_dbl_invalid                    0x08002f29   Thumb Code    12  dunder.o(i.__mathlib_dbl_invalid)
-    __mathlib_dbl_overflow                   0x08002f35   Thumb Code    14  dunder.o(i.__mathlib_dbl_overflow)
-    __mathlib_dbl_underflow                  0x08002f45   Thumb Code    10  dunder.o(i.__mathlib_dbl_underflow)
-    __scatterload_copy                       0x08002f55   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x08002f63   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x08002f65   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    __set_errno                              0x08002f75   Thumb Code     6  errno.o(i.__set_errno)
-    exception                                0x08002f81   Thumb Code    28  main.o(i.exception)
-    free                                     0x08002fa1   Thumb Code    76  malloc.o(i.free)
-    main                                     0x08002ff1   Thumb Code   122  main.o(i.main)
-    malloc                                   0x08003071   Thumb Code    92  malloc.o(i.malloc)
-    pow                                      0x080030dd   Thumb Code  2512  pow.o(i.pow)
-    sqrt                                     0x08003ab5   Thumb Code    76  sqrt.o(i.sqrt)
-    __mathlib_zero                           0x08003d30   Data           8  qnan.o(.constdata)
-    Region$$Table$$Base                      0x08003d38   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08003d58   Number         0  anon$$obj.o(Region$$Table)
+    __ARM_fpclassify                         0x08002ea1   Thumb Code    40  fpclassify.o(i.__ARM_fpclassify)
+    __kernel_poly                            0x08002ec9   Thumb Code   170  poly.o(i.__kernel_poly)
+    __mathlib_dbl_divzero                    0x08002f75   Thumb Code    12  dunder.o(i.__mathlib_dbl_divzero)
+    __mathlib_dbl_infnan2                    0x08002f85   Thumb Code     4  dunder.o(i.__mathlib_dbl_infnan2)
+    __mathlib_dbl_invalid                    0x08002f89   Thumb Code    12  dunder.o(i.__mathlib_dbl_invalid)
+    __mathlib_dbl_overflow                   0x08002f95   Thumb Code    14  dunder.o(i.__mathlib_dbl_overflow)
+    __mathlib_dbl_underflow                  0x08002fa5   Thumb Code    10  dunder.o(i.__mathlib_dbl_underflow)
+    __scatterload_copy                       0x08002fb5   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x08002fc3   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x08002fc5   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    __set_errno                              0x08002fd5   Thumb Code     6  errno.o(i.__set_errno)
+    exception                                0x08002fe1   Thumb Code    28  main.o(i.exception)
+    free                                     0x08003001   Thumb Code    76  malloc.o(i.free)
+    main                                     0x08003051   Thumb Code   122  main.o(i.main)
+    malloc                                   0x080030d1   Thumb Code    92  malloc.o(i.malloc)
+    pow                                      0x0800313d   Thumb Code  2512  pow.o(i.pow)
+    sqrt                                     0x08003b15   Thumb Code    76  sqrt.o(i.sqrt)
+    __mathlib_zero                           0x08003d40   Data           8  qnan.o(.constdata)
+    Region$$Table$$Base                      0x08003d48   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08003d68   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000000   Data           4  system_stm32f10x.o(.data)
     AHBPrescTable                            0x20000004   Data          16  system_stm32f10x.o(.data)
     gpio_initstruct                          0x2000002c   Data           4  bsp_iic_debug.o(.data)
@@ -1437,40 +1434,40 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000043f4, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00003f98])
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00004404, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00003fa8])
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003d58, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003d68, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000000ec   Data   RO            3    RESET               startup_stm32f10x_md.o
     0x080000ec   0x080000ec   0x00000000   Code   RO         3784  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x080000ec   0x080000ec   0x00000004   Code   RO         3857    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x080000f0   0x080000f0   0x00000004   Code   RO         3860    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3862    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         3864    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x080000f4   0x080000f4   0x00000008   Code   RO         3865    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         3867    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         3869    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x080000fc   0x080000fc   0x00000004   Code   RO         3858    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x080000ec   0x080000ec   0x00000004   Code   RO         3855    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x080000f0   0x080000f0   0x00000004   Code   RO         3858    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3860    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         3862    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x080000f4   0x080000f4   0x00000008   Code   RO         3863    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         3865    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         3867    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x080000fc   0x080000fc   0x00000004   Code   RO         3856    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x08000100   0x08000100   0x00000024   Code   RO            4    .text               startup_stm32f10x_md.o
     0x08000124   0x08000124   0x0000001e   Code   RO         3787    .text               mc_w.l(llshl.o)
     0x08000142   0x08000142   0x00000002   PAD
     0x08000144   0x08000144   0x00000024   Code   RO         3789    .text               mc_w.l(rand.o)
-    0x08000168   0x08000168   0x0000014e   Code   RO         3820    .text               mf_w.l(dadd.o)
-    0x080002b6   0x080002b6   0x000000e4   Code   RO         3822    .text               mf_w.l(dmul.o)
-    0x0800039a   0x0800039a   0x00000022   Code   RO         3824    .text               mf_w.l(dflti.o)
-    0x080003bc   0x080003bc   0x0000001a   Code   RO         3826    .text               mf_w.l(dfltui.o)
-    0x080003d6   0x080003d6   0x00000032   Code   RO         3828    .text               mf_w.l(dfixui.o)
-    0x08000408   0x08000408   0x00000020   Code   RO         3871    .text               mc_w.l(llushr.o)
-    0x08000428   0x08000428   0x00000024   Code   RO         3873    .text               mc_w.l(llsshr.o)
-    0x0800044c   0x0800044c   0x00000000   Code   RO         3888    .text               mc_w.l(iusefp.o)
-    0x0800044c   0x0800044c   0x000000ba   Code   RO         3889    .text               mf_w.l(depilogue.o)
-    0x08000506   0x08000506   0x000000de   Code   RO         3891    .text               mf_w.l(ddiv.o)
-    0x080005e4   0x080005e4   0x0000002e   Code   RO         3893    .text               mf_w.l(dscalb.o)
-    0x08000612   0x08000612   0x00000002   PAD
-    0x08000614   0x08000614   0x00000030   Code   RO         3895    .text               mf_w.l(cdrcmple.o)
-    0x08000644   0x08000644   0x00000024   Code   RO         3897    .text               mc_w.l(init.o)
+    0x08000168   0x08000168   0x000000e4   Code   RO         3820    .text               mf_w.l(dmul.o)
+    0x0800024c   0x0800024c   0x00000022   Code   RO         3822    .text               mf_w.l(dflti.o)
+    0x0800026e   0x0800026e   0x0000001a   Code   RO         3824    .text               mf_w.l(dfltui.o)
+    0x08000288   0x08000288   0x00000032   Code   RO         3826    .text               mf_w.l(dfixui.o)
+    0x080002ba   0x080002ba   0x00000020   Code   RO         3869    .text               mc_w.l(llushr.o)
+    0x080002da   0x080002da   0x00000000   Code   RO         3884    .text               mc_w.l(iusefp.o)
+    0x080002da   0x080002da   0x000000ba   Code   RO         3885    .text               mf_w.l(depilogue.o)
+    0x08000394   0x08000394   0x0000014e   Code   RO         3887    .text               mf_w.l(dadd.o)
+    0x080004e2   0x080004e2   0x000000de   Code   RO         3889    .text               mf_w.l(ddiv.o)
+    0x080005c0   0x080005c0   0x0000002e   Code   RO         3891    .text               mf_w.l(dscalb.o)
+    0x080005ee   0x080005ee   0x00000002   PAD
+    0x080005f0   0x080005f0   0x00000030   Code   RO         3893    .text               mf_w.l(cdrcmple.o)
+    0x08000620   0x08000620   0x00000024   Code   RO         3895    .text               mc_w.l(init.o)
+    0x08000644   0x08000644   0x00000024   Code   RO         3897    .text               mc_w.l(llsshr.o)
     0x08000668   0x08000668   0x000000a2   Code   RO         3899    .text               mf_w.l(dsqrt.o)
     0x0800070a   0x0800070a   0x00000056   Code   RO         3911    .text               mc_w.l(__dczerorl2.o)
     0x08000760   0x08000760   0x00000030   Code   RO         3747    i.ADCMod_GetKnob    adcmod.o
@@ -1570,49 +1567,49 @@ Memory Map of the image
     0x08001f8c   0x08001f8c   0x00000018   Code   RO         3468    i.TimingDelay_Decrement  bsp_systick.o
     0x08001fa4   0x08001fa4   0x00000004   Code   RO         3164    i.UsageFault_Handler  stm32f10x_it.o
     0x08001fa8   0x08001fa8   0x00000134   Code   RO         3237    i._AfterDrop        tetris.o
-    0x080020dc   0x080020dc   0x000000ec   Code   RO         3238    i._CalculateGridLine  tetris.o
-    0x080021c8   0x080021c8   0x00000050   Code   RO         3239    i._DetectCollision  tetris.o
-    0x08002218   0x08002218   0x000002b0   Code   RO         3240    i._Draw             tetris.o
-    0x080024c8   0x080024c8   0x00000188   Code   RO         3241    i._FastDrop         tetris.o
-    0x08002650   0x08002650   0x00000080   Code   RO         3242    i._GetBlockRealPos  tetris.o
-    0x080026d0   0x080026d0   0x000000d0   Code   RO         3243    i._InitializeGameState  tetris.o
-    0x080027a0   0x080027a0   0x00000068   Code   RO         3244    i._Input            tetris.o
-    0x08002808   0x08002808   0x000000f4   Code   RO         3245    i._SaveSwitch       tetris.o
-    0x080028fc   0x080028fc   0x00000068   Code   RO         3246    i._Time             tetris.o
-    0x08002964   0x08002964   0x00000188   Code   RO         3247    i._TryMoveCurrent   tetris.o
-    0x08002aec   0x08002aec   0x00000228   Code   RO         3248    i._TryRotateCurrent  tetris.o
-    0x08002d14   0x08002d14   0x00000068   Code   RO         3249    i._UpdateNext       tetris.o
-    0x08002d7c   0x08002d7c   0x000000c4   Code   RO         3701    i._UpdateNums       gui.o
-    0x08002e40   0x08002e40   0x00000028   Code   RO         3844    i.__ARM_fpclassify  m_ws.l(fpclassify.o)
-    0x08002e68   0x08002e68   0x000000aa   Code   RO         3846    i.__kernel_poly     m_ws.l(poly.o)
-    0x08002f12   0x08002f12   0x00000002   PAD
-    0x08002f14   0x08002f14   0x00000010   Code   RO         3830    i.__mathlib_dbl_divzero  m_ws.l(dunder.o)
-    0x08002f24   0x08002f24   0x00000004   Code   RO         3832    i.__mathlib_dbl_infnan2  m_ws.l(dunder.o)
-    0x08002f28   0x08002f28   0x0000000c   Code   RO         3833    i.__mathlib_dbl_invalid  m_ws.l(dunder.o)
-    0x08002f34   0x08002f34   0x0000000e   Code   RO         3834    i.__mathlib_dbl_overflow  m_ws.l(dunder.o)
-    0x08002f42   0x08002f42   0x00000002   PAD
-    0x08002f44   0x08002f44   0x00000010   Code   RO         3836    i.__mathlib_dbl_underflow  m_ws.l(dunder.o)
-    0x08002f54   0x08002f54   0x0000000e   Code   RO         3905    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x08002f62   0x08002f62   0x00000002   Code   RO         3906    i.__scatterload_null  mc_w.l(handlers.o)
-    0x08002f64   0x08002f64   0x0000000e   Code   RO         3907    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x080020dc   0x080020dc   0x00000100   Code   RO         3238    i._CalculateGridLine  tetris.o
+    0x080021dc   0x080021dc   0x00000050   Code   RO         3239    i._DetectCollision  tetris.o
+    0x0800222c   0x0800222c   0x000002b0   Code   RO         3240    i._Draw             tetris.o
+    0x080024dc   0x080024dc   0x0000018c   Code   RO         3241    i._FastDrop         tetris.o
+    0x08002668   0x08002668   0x00000080   Code   RO         3242    i._GetBlockRealPos  tetris.o
+    0x080026e8   0x080026e8   0x000000d0   Code   RO         3243    i._InitializeGameState  tetris.o
+    0x080027b8   0x080027b8   0x00000078   Code   RO         3244    i._Input            tetris.o
+    0x08002830   0x08002830   0x000000f4   Code   RO         3245    i._SaveSwitch       tetris.o
+    0x08002924   0x08002924   0x00000090   Code   RO         3246    i._Time             tetris.o
+    0x080029b4   0x080029b4   0x00000188   Code   RO         3247    i._TryMoveCurrent   tetris.o
+    0x08002b3c   0x08002b3c   0x00000238   Code   RO         3248    i._TryRotateCurrent  tetris.o
+    0x08002d74   0x08002d74   0x00000068   Code   RO         3249    i._UpdateNext       tetris.o
+    0x08002ddc   0x08002ddc   0x000000c4   Code   RO         3701    i._UpdateNums       gui.o
+    0x08002ea0   0x08002ea0   0x00000028   Code   RO         3842    i.__ARM_fpclassify  m_ws.l(fpclassify.o)
+    0x08002ec8   0x08002ec8   0x000000aa   Code   RO         3844    i.__kernel_poly     m_ws.l(poly.o)
     0x08002f72   0x08002f72   0x00000002   PAD
-    0x08002f74   0x08002f74   0x0000000c   Code   RO         3883    i.__set_errno       mc_w.l(errno.o)
-    0x08002f80   0x08002f80   0x00000020   Code   RO         3099    i.exception         main.o
-    0x08002fa0   0x08002fa0   0x00000050   Code   RO         3792    i.free              mc_w.l(malloc.o)
-    0x08002ff0   0x08002ff0   0x00000080   Code   RO         3100    i.main              main.o
-    0x08003070   0x08003070   0x0000006c   Code   RO         3793    i.malloc            mc_w.l(malloc.o)
-    0x080030dc   0x080030dc   0x000009d8   Code   RO         3775    i.pow               m_ws.l(pow.o)
-    0x08003ab4   0x08003ab4   0x0000004c   Code   RO         3850    i.sqrt              m_ws.l(sqrt.o)
-    0x08003b00   0x08003b00   0x000000ce   Data   RO         3251    .constdata          tetris.o
-    0x08003bce   0x08003bce   0x000000a2   Data   RO         3506    .constdata          paj7620u2.o
-    0x08003c70   0x08003c70   0x00000032   Data   RO         3702    .constdata          gui.o
-    0x08003ca2   0x08003ca2   0x00000006   PAD
-    0x08003ca8   0x08003ca8   0x00000088   Data   RO         3776    .constdata          m_ws.l(pow.o)
-    0x08003d30   0x08003d30   0x00000008   Data   RO         3848    .constdata          m_ws.l(qnan.o)
-    0x08003d38   0x08003d38   0x00000020   Data   RO         3903    Region$$Table       anon$$obj.o
+    0x08002f74   0x08002f74   0x00000010   Code   RO         3828    i.__mathlib_dbl_divzero  m_ws.l(dunder.o)
+    0x08002f84   0x08002f84   0x00000004   Code   RO         3830    i.__mathlib_dbl_infnan2  m_ws.l(dunder.o)
+    0x08002f88   0x08002f88   0x0000000c   Code   RO         3831    i.__mathlib_dbl_invalid  m_ws.l(dunder.o)
+    0x08002f94   0x08002f94   0x0000000e   Code   RO         3832    i.__mathlib_dbl_overflow  m_ws.l(dunder.o)
+    0x08002fa2   0x08002fa2   0x00000002   PAD
+    0x08002fa4   0x08002fa4   0x00000010   Code   RO         3834    i.__mathlib_dbl_underflow  m_ws.l(dunder.o)
+    0x08002fb4   0x08002fb4   0x0000000e   Code   RO         3905    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x08002fc2   0x08002fc2   0x00000002   Code   RO         3906    i.__scatterload_null  mc_w.l(handlers.o)
+    0x08002fc4   0x08002fc4   0x0000000e   Code   RO         3907    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08002fd2   0x08002fd2   0x00000002   PAD
+    0x08002fd4   0x08002fd4   0x0000000c   Code   RO         3879    i.__set_errno       mc_w.l(errno.o)
+    0x08002fe0   0x08002fe0   0x00000020   Code   RO         3099    i.exception         main.o
+    0x08003000   0x08003000   0x00000050   Code   RO         3792    i.free              mc_w.l(malloc.o)
+    0x08003050   0x08003050   0x00000080   Code   RO         3100    i.main              main.o
+    0x080030d0   0x080030d0   0x0000006c   Code   RO         3793    i.malloc            mc_w.l(malloc.o)
+    0x0800313c   0x0800313c   0x000009d8   Code   RO         3775    i.pow               m_ws.l(pow.o)
+    0x08003b14   0x08003b14   0x0000004c   Code   RO         3848    i.sqrt              m_ws.l(sqrt.o)
+    0x08003b60   0x08003b60   0x0000007e   Data   RO         3251    .constdata          tetris.o
+    0x08003bde   0x08003bde   0x000000a2   Data   RO         3506    .constdata          paj7620u2.o
+    0x08003c80   0x08003c80   0x00000032   Data   RO         3702    .constdata          gui.o
+    0x08003cb2   0x08003cb2   0x00000006   PAD
+    0x08003cb8   0x08003cb8   0x00000088   Data   RO         3776    .constdata          m_ws.l(pow.o)
+    0x08003d40   0x08003d40   0x00000008   Data   RO         3846    .constdata          m_ws.l(qnan.o)
+    0x08003d48   0x08003d48   0x00000020   Data   RO         3903    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003d58, Size: 0x000010e0, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x00000240])
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003d68, Size: 0x000010e0, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x00000240])
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1627,9 +1624,9 @@ Memory Map of the image
     0x20000689   COMPRESSED   0x00000001   Data   RW         3703    .data               gui.o
     0x2000068a   COMPRESSED   0x00000002   PAD
     0x2000068c   COMPRESSED   0x00000004   Data   RW         3790    .data               mc_w.l(rand.o)
-    0x20000690   COMPRESSED   0x00000004   Data   RW         3879    .data               mc_w.l(mvars.o)
-    0x20000694   COMPRESSED   0x00000004   Data   RW         3880    .data               mc_w.l(mvars.o)
-    0x20000698   COMPRESSED   0x00000004   Data   RW         3884    .data               mc_w.l(errno.o)
+    0x20000690   COMPRESSED   0x00000004   Data   RW         3875    .data               mc_w.l(mvars.o)
+    0x20000694   COMPRESSED   0x00000004   Data   RW         3876    .data               mc_w.l(mvars.o)
+    0x20000698   COMPRESSED   0x00000004   Data   RW         3880    .data               mc_w.l(errno.o)
     0x2000069c        -       0x00000030   Zero   RW         3250    .bss                tetris.o
     0x200006cc   COMPRESSED   0x00000004   PAD
     0x200006d0        -       0x00000410   Zero   RW         3416    .bss                oled.o
@@ -1664,11 +1661,11 @@ Image component sizes
         64         12          0          0          0       1178   stm32f10x_rcc.o
        218         42          0          0          0       3532   stm32f10x_tim.o
        328         28          0         20          0     259925   system_stm32f10x.o
-      3676        366        206         24         48      11742   tetris.o
+      3772        370        126         24         48      11918   tetris.o
        120          0          0          0          0        946   tim2.o
 
     ----------------------------------------------------------------------
-     10148        810        692       1676       2628     345154   Object Totals
+     10244        814        612       1676       2628     345330   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         18          0          6          2          4          0   (incl. Padding)
 
@@ -1734,15 +1731,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     14868       1062        836       1692       2628     341534   Grand Totals
-     14868       1062        836        576       2628     341534   ELF Image Totals (compressed)
-     14868       1062        836        576          0          0   ROM Totals
+     14964       1066        756       1692       2628     341710   Grand Totals
+     14964       1066        756        576       2628     341710   ELF Image Totals (compressed)
+     14964       1066        756        576          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                15704 (  15.34kB)
+    Total RO  Size (Code + RO Data)                15720 (  15.35kB)
     Total RW  Size (RW Data + ZI Data)              4320 (   4.22kB)
-    Total ROM Size (Code + RO Data + RW Data)      16280 (  15.90kB)
+    Total ROM Size (Code + RO Data + RW Data)      16296 (  15.91kB)
 
 ==============================================================================
 

@@ -37,41 +37,43 @@ static uint8_t _gDirty;               // 显示更新用脏标记，从最低位
 static int8_t _time;                  // 游戏次级计时器
 static uint8_t _gameSpd = 10;         // 每帧时间，数值回头会改
 static uint8_t _gameLoop;             // 主循环持续标志，为0时游戏结束
-static uint8_t _fastDrop;             // 用于标志快速降落（下输入）
+static uint8_t _gameFlags;            // 用于标志游戏的各项状态
 static uint8_t _saveSwitched;         // 用于标志当前是否进行过saved切换
 static BlockType _blockBag[7];        // 该轮的随机出块包
 static uint8_t _blockBagPos;          // 当前出块在随机出块包的位置
 
 #pragma region 图形们
 
-static const uint64_t G_GridCells[10] = {
-    //     (0b1111 << 5),
-    //     (0b1111 << 10),
-    //     (0b1111 << 15),
-    //     (0b1111 << 20),
-    //     (0b1111 << 25),
-    //     (0b1111 << 30),
-    //     (0b1111 << 35),
-    //     (0b1111 << 40),
-    //     奇异搞笑编译器不能编译时计算，我硬编码吧
-    //    0000    0000
-    0x00000000000001E0,
-    0x0000000000003C00,
-    0x0000000000078000,
-    0x0000000000F00000,
-    0x000000001E000000,
-    0x00000003C0000000,
-    0x0000007800000000,
-    0x00000F0000000000,
-    0x0001E00000000000,
-    0x003C000000000000,
-};
-static const uint64_t G_GridCellMask = 
-    0x007FFFFFFFFFFFF0;
-static const uint8_t G_GridCellShiftV = 23;
+// static const uint64_t G_GridCells[10] = {
+//     //     (0b1111 << 5),
+//     //     (0b1111 << 10),
+//     //     (0b1111 << 15),
+//     //     (0b1111 << 20),
+//     //     (0b1111 << 25),
+//     //     (0b1111 << 30),
+//     //     (0b1111 << 35),
+//     //     (0b1111 << 40),
+//     //     奇异搞笑编译器不能编译时计算，我硬编码吧
+//     //    0000    0000
+//     0x00000000000001E0,
+//     0x0000000000003C00,
+//     0x0000000000078000,
+//     0x0000000000F00000,
+//     0x000000001E000000,
+//     0x00000003C0000000,
+//     0x0000007800000000,
+//     0x00000F0000000000,
+//     0x0001E00000000000,
+//     0x003C000000000000,
+// };
+
+#define GG_GRIDCELL(i) ((uint64_t)0x0f << 5*(i+1))
+#define GG_GRIDCELL_MASK \
+    0x007FFFFFFFFFFFF0
+#define GG_GRIDCELL_SHIFT_V 23
 
 
-static const uint8_t G_BlockPreviews[8][4] = {
+static const uint8_t GG_BlockPreviews[8][4] = {
     {0x00,0x00,0x00,0x00},//None
     {0x00,0xFF,0xFF,0x00},//I
     {0x7E,0x7E,0x18,0x18},//T
@@ -81,9 +83,12 @@ static const uint8_t G_BlockPreviews[8][4] = {
     {0x06,0x06,0x7E,0x7E},//J
     {0x60,0x60,0x7E,0x7E},//L
 };
-static const uint8_t G_BlockPreviewShiftV = 12;
-static const uint8_t G_NextPreviewShiftH = 23;
-static const uint8_t G_SavePreviewShiftH = 5;
+// static const uint8_t G_BlockPreviewShiftV = 12;
+// static const uint8_t G_NextPreviewShiftH = 23;
+// static const uint8_t G_SavePreviewShiftH = 5;
+#define GG_BLOCKPREV_SHIFT_V 12
+#define GG_NEXTPREV_SHIFT_H 23
+#define GG_SAVEPREV_SHIFT_H 5
 
 
 static const uint8_t G_Nums[10][3] = {
@@ -98,11 +103,15 @@ static const uint8_t G_Nums[10][3] = {
     {0x7C,0x54,0x7C},//8
     {0x7C,0x54,0x5C},//9
 };
-static const uint8_t G_NumsMask = 0x7C;
-static const uint8_t G_NumsShiftH = 20;
+// static const uint8_t G_NumsMask = 0x7C;
+// static const uint8_t G_NumsShiftH = 20;
+#define GG_NUMS_MASK 0x7C
+#define GG_NUMS_SHIFT_H 20
 
-static const uint32_t G_SavUnable = 0x00016842;
-static const uint8_t G_SavUnableShiftV = 5;
+// static const uint32_t G_SavUnable = 0x00016842;
+// static const uint8_t G_SavUnableShiftV = 5;
+#define GG_SAV_UNABLE 0x00016842
+#define GG_SAV_UNABLE_SHIFT_V 5
 
 #pragma endregion
 
@@ -118,6 +127,9 @@ static const uint16_t Blocks[8][4]= { // 格式：Blocks[类型][朝向] 里面�
     {0x126A,0x4568,0x159A,0x2456}, // J
     {0x1259,0x0456,0x269A,0x456A}, // L
 };
+
+#define GF_FAST_DROP 0x01 // 速降标志（下输入）
+#define GF_T_SPIN 0x02    // T-Spin标志（最后一步为旋转而非下落）todo:未实装
 
 #pragma endregion
 
@@ -149,7 +161,7 @@ uint32_t Tetris_MainGameLoop(uint8_t timescale)
         _Time(); // 时间更新
         _Draw(); // 在最后执行一个绘制帧
         Led_Flash_B();
-        while (_time <= 0) ; // 防止重复执行
+        while (_time <= 0) ; // 锁定程序至下一个时间周期，防止程序重复执行
     }
 
     return _score;
@@ -182,7 +194,7 @@ static void _InitializeGameState(void)
     _score = 0;
     _currentBlock = _nextBlock = _savedBlock = BlockType_None;
     _gDirty = 0;
-    _fastDrop = 0;
+    _gameFlags = 0;
     _saveSwitched = 0;
     _blockBagPos = 0;
     _gameLoop = 1;
@@ -201,7 +213,7 @@ static void _SaveSwitch(void);
 static void _AfterDrop(void);
 static int8_t _TryMoveCurrent(int8_t x, int8_t y);
 static int8_t _TryRotateCurrent(int8_t dir);
-static void _FastDrop(void);
+static uint8_t _FastDrop(void);
 static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer);
 static int8_t _DetectCollision(int8_t* blocks, int8_t xshift, int8_t yshift);
 
@@ -214,7 +226,7 @@ static void _Input(Input_Type input)
             _SaveSwitch();
             break;
         case Input_Type_Down:  
-            _fastDrop = 1;
+            _gameFlags |= GF_FAST_DROP;
             _time = -1;
             break;
         case Input_Type_Left:  
@@ -225,9 +237,11 @@ static void _Input(Input_Type input)
             break;
         case Input_Type_Clockwise:
             _TryRotateCurrent(1);
+            _time = 1; // 旋转操作刷新倒计时
             break;
         case Input_Type_AntiClockwise:
             _TryRotateCurrent(-1);
+            _time = 1;
             break;
 
         default: input_valid=0; break;
@@ -246,16 +260,20 @@ static void _Time(void)
         _UpdateNext();
     }
 
-    if (_fastDrop)
+    if (_gameFlags & GF_FAST_DROP)
     {
-        _FastDrop();
-        _fastDrop = 0;
+        if(_FastDrop()) _gameFlags &= ~GF_T_SPIN;
+        _gameFlags &= ~GF_FAST_DROP;
         _currentBlock = BlockType_None;
         _AfterDrop();
         return;
     }
     
-    if(!_TryMoveCurrent(0, -1))
+    if(_TryMoveCurrent(0, -1))
+    {
+        _gameFlags &= ~GF_T_SPIN;
+    }
+    else
     {
         _currentBlock = BlockType_None;
         _AfterDrop();
@@ -341,7 +359,9 @@ void _AfterDrop(void)
     if (cleared != 0)
     {
         _gDirty |= 0x01;
-        _score += pow(2, cleared) * (19-_gameSpd);
+        uint32_t add_score = pow(2, cleared) * (19-_gameSpd);
+        if (_gameFlags & GF_T_SPIN) add_score *= 2;
+        _score += add_score;
     }
 
     // 判定gameover
@@ -421,6 +441,7 @@ int8_t _TryRotateCurrent(int8_t dir)
     if (succeed)
     {
         _currentBlockRotation = (_currentBlockRotation+4+dir) % 4;
+        _gameFlags |= GF_T_SPIN;
     }
 
     _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
@@ -435,9 +456,9 @@ int8_t _TryRotateCurrent(int8_t dir)
     return succeed;
 }
 
-void _FastDrop(void)
+uint8_t _FastDrop(void)
 {
-    if(_currentBlock == BlockType_None) return;
+    if(_currentBlock == BlockType_None) return 0;
 
     int8_t blocks[4][2];
     _GetBlockRealPos(_currentBlock, _currentBlockRotation, _currentPosX, _currentPosY, blocks[0]);
@@ -467,6 +488,8 @@ void _FastDrop(void)
         _gameGrid[blocks[i][1]] |= 1 << (blocks[i][0]);
         _gameGrid[blocks[i][1]] |= 0x8000;
     }
+
+    return (uint8_t)-yshift;
 }
 
 static void _GetBlockRealPos(BlockType block, uint8_t rotate, int8_t x, int8_t y, int8_t* buffer)
@@ -515,9 +538,9 @@ static void _Draw(void)
             uint8_t n = score%10;
             for (uint8_t j = 1; j <= 3; j++)
             {
-                uint8_t scr_h = G_NumsShiftH + i*4 +j;
+                uint8_t scr_h = GG_NUMS_SHIFT_H + i*4 +j;
                 scr_Dirty[scr_h/8] |= 0x80>>(scr_h%8);
-                scr_Cache[scr_h] |= (uint64_t)G_NumsMask << 56; // 分数显示是反色的
+                scr_Cache[scr_h] |= (uint64_t)GG_NUMS_MASK << 56; // 分数显示是反色的
                 scr_Cache[scr_h] &= ~((uint64_t)G_Nums[n][j-1] << 56);
             }
             score/=10;
@@ -530,34 +553,34 @@ static void _Draw(void)
     {
         for (uint8_t i = 0; i < 4; i++)
         {
-            uint8_t scr_h = G_BlockPreviewShiftV+i;
+            uint8_t scr_h = GG_BLOCKPREV_SHIFT_V+i;
             scr_Dirty[scr_h/8] |= 0x80>>(scr_h%8);
-            scr_Cache[scr_h] &= ~((uint64_t)0xFF << G_SavePreviewShiftH);
-            scr_Cache[scr_h] |= (uint64_t)G_BlockPreviews[_savedBlock][i] << G_SavePreviewShiftH;
+            scr_Cache[scr_h] &= ~((uint64_t)0xFF << GG_SAVEPREV_SHIFT_H);
+            scr_Cache[scr_h] |= (uint64_t)GG_BlockPreviews[_savedBlock][i] << GG_SAVEPREV_SHIFT_H;
         }
     }
     if (_gDirty & 0x04) // NextBlock
     {
         for (uint8_t i = 0; i < 4; i++)
         {
-            uint8_t scr_h = G_BlockPreviewShiftV+i;
+            uint8_t scr_h = GG_BLOCKPREV_SHIFT_V+i;
             scr_Dirty[scr_h/8] |= 0x80>>(scr_h%8);
-            scr_Cache[scr_h] &= ~((uint64_t)0xFF << G_NextPreviewShiftH);
-            scr_Cache[scr_h] |= (uint64_t)G_BlockPreviews[_nextBlock][i] << G_NextPreviewShiftH;
+            scr_Cache[scr_h] &= ~((uint64_t)0xFF << GG_NEXTPREV_SHIFT_H);
+            scr_Cache[scr_h] |= (uint64_t)GG_BlockPreviews[_nextBlock][i] << GG_NEXTPREV_SHIFT_H;
         }
     }
 
     // 更新sav字符状态
     if (_gDirty & 0x08)
     {
-        scr_Dirty[G_SavUnableShiftV/8] |= 0x80>>(G_SavUnableShiftV%8);
+        scr_Dirty[GG_SAV_UNABLE_SHIFT_V/8] |= 0x80>>(GG_SAV_UNABLE_SHIFT_V%8);
         if (_saveSwitched) 
         {
-            scr_Cache[G_SavUnableShiftV] &= ~(uint64_t)G_SavUnable;
+            scr_Cache[GG_SAV_UNABLE_SHIFT_V] &= ~(uint64_t)GG_SAV_UNABLE;
         }
         else
         {
-            scr_Cache[G_SavUnableShiftV] |= G_SavUnable;
+            scr_Cache[GG_SAV_UNABLE_SHIFT_V] |= GG_SAV_UNABLE;
         }
     }
 
@@ -585,15 +608,15 @@ static void _CalculateGridLine(uint8_t h, uint16_t grid)
     for (uint8_t i = 0; i < 10; i++)
     {
         if ((grid & 1<<i) == 0) continue;
-        line |= G_GridCells[i];
+        line |= GG_GRIDCELL(i);//G_GridCells[i];
     }
-    uint8_t scr_hb = G_GridCellShiftV + (19-h)*5;
+    uint8_t scr_hb = GG_GRIDCELL_SHIFT_V + (19-h)*5;
     // scr_dirty[scr_hb/8] |= 0x80>>(scr_hb%8); // 算了一下，还是不必要的行就略过开销更小
     for (uint8_t j = 1; j <= 4; j++)
     {
         uint8_t scr_h = scr_hb + j;
         scr_Dirty[scr_h/8] |= 0x80>>(scr_h%8);
-        scr_Cache[scr_h] &=  ~G_GridCellMask ;
+        scr_Cache[scr_h] &=  ~GG_GRIDCELL_MASK ;
         scr_Cache[scr_h] |= line;
     }
 }
